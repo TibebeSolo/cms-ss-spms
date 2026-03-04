@@ -1,0 +1,23 @@
+name: CD
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Build Docker image
+        run: docker build -t ss-spms-web:latest .
+
+      - name: Deploy via SSH (Documentation)
+        run: |
+          echo "Deployment steps:"
+          echo "1. Connect to production server via SSH"
+          echo "2. Pull latest code/docker image"
+          echo "3. Run 'docker compose -f docker-compose.prod.yml up -d'"
+          echo "4. Run migrations: 'docker compose exec web python manage.py migrate'"
+          # In a real environment, use appleboy/ssh-action or similar
