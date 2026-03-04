@@ -19,6 +19,16 @@ SS-SPMS is a profile management and attendance tracking system designed for EOTC
 4. Run migrations: `docker compose exec web python manage.py migrate`.
 5. Create a superuser: `docker compose exec web python manage.py createsuperuser`.
 
+## Running Tests
+Run tests using the provided script:
+```bash
+./scripts/test.sh
+```
+Or directly via docker compose:
+```bash
+docker compose exec web python -m pytest
+```
+
 ## CI/CD
 Automated testing and linting are performed on every Pull Request via GitHub Actions.
 - **Linter**: Ruff
