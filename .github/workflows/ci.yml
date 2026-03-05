@@ -25,29 +25,46 @@ jobs:
         
       - name: Check formatting with black
         run: black --check .
-        
-
-      - name: Start Postgres
-        uses: postgres-actions/postgres@v1
-        with:
-          postgres version: '16'
-          postgres db: ss_spms
-          postgres user: postgres
-          postgres password: postgres
-
-      - name: Wait for Postgres
-        run: |
-          for i in {1..10}; do
-            pg_isready -h localhost -p 5432 && break
-            sleep 2
-          done
-
-      - name: Prepare .env
-        run: cp .env.example .env
-
-      - name: Run migrations
-        run: |
-          python manage.py migrate
-
-      - name: Run tests
-        run: pytest
+        jobs:
+          test:
+            runs-on: ubuntu-latest
+            services:
+              postgres:
+                image: postgres:16
+                env:
+                  POSTGRES_DB: ss_spms
+                  POSTGRES_USER: postgres
+                  POSTGRES_PASSWORD: postgres
+                ports:
+                  - 5432:5432
+                options: >-
+                  --health-cmd="pg_isready -U postgres" \
+                  --health-interval=10s \
+                  --health-timeout=5s \
+                  --health-retries=5
+            steps:
+              - uses: actions/checkout@v4
+              - name: Set up Python
+                uses: actions/setup-python@v5
+                with:
+                  python-version: '3.12'
+              - name: Install dependencies
+                run: |
+                  python -m pip install --upgrade pip
+                  pip install ruff black pytest pytest-django django-environ ethioqen reportlab openpyxl Pillow django-htmx psycopg[binary]
+              - name: Lint with ruff
+                run: ruff check .
+              - name: Check formatting with black
+                run: black --check .
+              - name: Prepare .env
+                run: cp .env.example .env
+              - name: Wait for Postgres
+                run: |
+                  for i in {1..10}; do
+                    pg_isready -h localhost -p 5432 && break
+                    sleep 2
+                  done
+              - name: Run migrations
+                run: python manage.py migrate
+              - name: Run tests
+                run: pytest
