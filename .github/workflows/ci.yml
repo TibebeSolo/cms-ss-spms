@@ -26,11 +26,28 @@ jobs:
       - name: Check formatting with black
         run: black --check .
         
-      - name: Run tests
+
+      - name: Start Postgres
+        uses: postgres-actions/postgres@v1
+        with:
+          postgres version: '16'
+          postgres db: ss_spms
+          postgres user: postgres
+          postgres password: postgres
+
+      - name: Wait for Postgres
         run: |
-          cp .env.example .env
-          export DB_HOST=localhost
-          export DB_PORT=5432
-          # Note: In a real CI, you'd start a Postgres container here via services
-          # For now, we'll assume a basic smoke test that doesn't need a real DB or use sqlite for CI
-          pytest
+          for i in {1..10}; do
+            pg_isready -h localhost -p 5432 && break
+            sleep 2
+          done
+
+      - name: Prepare .env
+        run: cp .env.example .env
+
+      - name: Run migrations
+        run: |
+          python manage.py migrate
+
+      - name: Run tests
+        run: pytest
