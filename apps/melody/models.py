@@ -8,12 +8,21 @@ class MezemranMembership(models.Model):
         ('TERMINATED', 'Terminated'),
     ]
 
-    ss_student_profile = models.ForeignKey(SSStudentProfile, on_delete=models.CASCADE, related_name='mezemran_memberships')
+    # Requirement 16: Link to SS Profile
+    ss_student_profile = models.ForeignKey(
+        SSStudentProfile, 
+        on_delete=models.CASCADE, 
+        related_name='mezemran_memberships'
+        )
+    
+    # Requirement 16: Mezemran ID
+    # ID Format: {SSAbbrev}MZ{YY}{RRR}
     mezmur_entry_year_eth = models.IntegerField()
     mezemran_roll_number = models.IntegerField() # 3-digit zero-padded roll, resets yearly
     mezemran_id = models.CharField(max_length=30, unique=True)
     
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='ACTIVE')
+    is_active = models.BooleanField(default=True)
     
     selected_at = models.DateTimeField()
     selected_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name='selected_mezemran')
