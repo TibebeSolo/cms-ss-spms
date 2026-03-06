@@ -1,0 +1,26 @@
+<div class="card shadow-sm border-0 border-start border-4 border-primary">
+    <div class="card-body d-flex justify-content-between align-items-center">
+        <div>
+            <h2 class="mb-1">{{ christian.full_name }}</h2>
+            <span class="badge bg-primary-subtle text-primary">General Parish Member</span>
+        </div>
+
+        {% if not christian.ss_student_profile %}
+        <button class="btn btn-success d-flex align-items-center gap-2"
+            hx-get="{% url 'ss:convert-form' christian.id %}" hx-target="#main-content">
+            <i class="bi bi-person-plus-fill"></i>
+            Convert to Sunday School Student
+        </button>
+        {% endif %}
+    </div>
+</div>
+
+<div class="mt-4 row">
+    <div class="col-md-6">
+        <div class="p-3 bg-white rounded shadow-sm">
+            <label class="text-muted small text-uppercase fw-bold">Date of Birth (Eth)</label>
+            <p class="fs-5 mb-0">{{ christian.dob_eth_string }} <span class="text-muted small">({{ christian.dob_greg
+                    }})</span></p>
+        </div>
+    </div>
+</div>

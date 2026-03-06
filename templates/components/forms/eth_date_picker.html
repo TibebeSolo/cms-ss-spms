@@ -1,0 +1,57 @@
+{#
+Usage Example:
+{% include "components/forms/eth_date_picker.html" with prefix="dob" label="Date of Birth (Eth)" %}
+#}
+
+<div class="eth-date-picker mb-3" id="picker-{{ prefix }}">
+    <label class="form-label fw-bold small text-muted text-uppercase">{{ label|default:"Ethiopian Date" }}</label>
+
+    <div class="input-group shadow-sm">
+        <input type="number" class="form-control text-center" name="eth_day" placeholder="Day" min="1" max="30"
+            hx-get="{% url 'people:hx-convert-eth-date' %}"
+            hx-include="#picker-{{ prefix }} input, #picker-{{ prefix }} select" hx-target="#greg-feedback-{{ prefix }}"
+            hx-trigger="keyup delay:400ms changed, change">
+
+        <select class="form-select" name="eth_month" hx-get="{% url 'people:hx-convert-eth-date' %}"
+            hx-include="#picker-{{ prefix }} input, #picker-{{ prefix }} select" hx-target="#greg-feedback-{{ prefix }}"
+            hx-trigger="change">
+            <option value="" selected disabled>Month</option>
+            <option value="1">1 - Meskerem</option>
+            <option value="2">2 - Tikimt</option>
+            <option value="3">3 - Hidar</option>
+            <option value="4">4 - Tahsas</option>
+            <option value="5">5 - Tir</option>
+            <option value="6">6 - Yekatit</option>
+            <option value="7">7 - Megabit</option>
+            <option value="8">8 - Miyazya</option>
+            <option value="9">9 - Ginbot</option>
+            <option value="10">10 - Sene</option>
+            <option value="11">11 - Hamle</option>
+            <option value="12">12 - Nehase</option>
+            <option value="13">13 - Pagume</option>
+        </select>
+
+        <input type="number" class="form-control text-center" name="eth_year" placeholder="Year (EC)" min="1900"
+            max="2100" hx-get="{% url 'people:hx-convert-eth-date' %}"
+            hx-include="#picker-{{ prefix }} input, #picker-{{ prefix }} select" hx-target="#greg-feedback-{{ prefix }}"
+            hx-trigger="keyup delay:400ms changed, change">
+    </div>
+
+    <div id="greg-feedback-{{ prefix }}" class="form-text mt-2 transition-fade">
+        <span class="text-muted small"><i class="bi bi-info-circle"></i> Enter a valid Ethiopian date to see Gregorian
+            equivalent.</span>
+    </div>
+</div>
+
+<style>
+    /* Slight visual polish for the picker */
+    .eth-date-picker .form-control:focus,
+    .eth-date-picker .form-select:focus {
+        border-color: var(--brand-primary);
+        box-shadow: 0 0 0 0.25rem var(--brand-primary-soft);
+    }
+
+    .transition-fade {
+        transition: all 0.3s ease-in-out;
+    }
+</style>

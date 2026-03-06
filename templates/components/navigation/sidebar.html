@@ -1,0 +1,52 @@
+<aside id="sidebar" class="bg-brand-primary text-white shadow" style="width: var(--sidebar-width);">
+    <div class="p-4 d-flex flex-column h-100">
+        <div class="mb-5 px-2">
+            {% include "components/brand/logo.html" with mode="primary" %}
+        </div>
+
+        <nav class="nav flex-column gap-2" hx-boost="true" hx-target="#main-content" hx-indicator=".htmx-indicator">
+            <a href="/" class="nav-link text-white d-flex align-items-center gap-3 rounded px-3 py-2 active-bg">
+                <i class="bi bi-speedometer2"></i> Dashboard
+            </a>
+
+            {% if perms.sundayschool.view_ssstudentprofile %}
+            <div class="mt-4 small text-uppercase opacity-50 px-3 fw-bold">Management</div>
+            <a href="{% url 'ss:student-list' %}"
+                class="nav-link text-white d-flex align-items-center gap-3 rounded px-3 py-2">
+                <i class="bi bi-people"></i> Students
+            </a>
+            <a href="{% url 'ss:attendance' %}"
+                class="nav-link text-white d-flex align-items-center gap-3 rounded px-3 py-2">
+                <i class="bi bi-calendar-check"></i> Attendance
+            </a>
+            {% endif %}
+
+            {% if perms.melody.view_mezemranmembership %}
+            <div class="mt-4 small text-uppercase opacity-50 px-3 fw-bold">Melody Dept</div>
+            <a href="{% url 'melody:roster' %}"
+                class="nav-link text-white d-flex align-items-center gap-3 rounded px-3 py-2">
+                <i class="bi bi-music-note-beamed"></i> Mezemran
+            </a>
+            {% endif %}
+
+            {% if perms.identity.all %}
+            <div class="mt-auto pt-4 border-top border-white border-opacity-10">
+                <a href="/admin/roles/" class="nav-link text-white d-flex align-items-center gap-3 rounded px-3 py-2">
+                    <i class="bi bi-shield-lock"></i> Permissions
+                </a>
+            </div>
+            {% endif %}
+        </nav>
+    </div>
+</aside>
+
+<style>
+    #sidebar .nav-link:hover {
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    #sidebar .nav-link.active-bg {
+        background: var(--brand-secondary);
+        color: #000 !important;
+    }
+</style>

@@ -16,6 +16,9 @@ class UserAccount(AbstractUser):
     # Requirement 17: No physical deletion
     is_active = models.BooleanField(default=True)
 
+    # Requirement: Forced onboarding workflow
+    requires_password_change = models.BooleanField(default=True)
+
     def is_locked(self):
         if self.locked_until and self.locked_until > timezone.now():
             return True

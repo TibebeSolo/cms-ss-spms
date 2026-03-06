@@ -1,0 +1,38 @@
+{% extends "layouts/dashboard.html" %}
+
+{% block content %}
+<div class="container max-w-md">
+    <div class="card border-0 shadow-sm mt-4">
+        <div class="card-header bg-white border-bottom-0 pt-4 pb-0">
+            <h4 class="fw-bold">Register Parish Member</h4>
+            <p class="text-muted small">Enter their basic details to generate a Church ID.</p>
+        </div>
+
+        <div class="card-body">
+            <form hx-post="{% url 'people:register' %}" hx-target="#main-content">
+                {% csrf_token %}
+
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <label class="form-label small fw-bold">First Name</label>
+                        <input type="text" name="first_name" class="form-control" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-bold">Father's Name</label>
+                        <input type="text" name="father_name" class="form-control" required>
+                    </div>
+                </div>
+
+                {% include "components/forms/eth_date_picker.html" with prefix="dob" label="Date of Birth" %}
+
+                <hr class="my-4">
+
+                <div class="d-flex justify-content-end gap-2">
+                    <a href="/" class="btn btn-light">Cancel</a>
+                    <button type="submit" class="btn btn-brand">Register & Generate ID</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

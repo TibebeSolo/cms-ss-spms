@@ -1,0 +1,31 @@
+<div class="card border-0 shadow-sm">
+    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Attendance: {{ session.class_group }}</h5>
+        <div id="stats-counter" hx-get="{% url 'ss:attendance-stats' session.id %}"
+            hx-trigger="attendanceChanged from:body">
+            {% include "apps/sundayschool/fragments/attendance_stats.html" %}
+        </div>
+    </div>
+    <div class="table-responsive">
+        <table class="table">
+            <tbody>
+                {% for student in students %}
+                <tr>
+                    <td>{{ student.christian.full_name }}</td>
+                    <td>
+                        <div class="btn-group btn-group-sm" role="group">
+                            <input type="radio" class="btn-check" name="status-{{student.id}}" id="p-{{student.id}}"
+                                hx-post="{% url 'ss:mark' session.id student.id 'PRESENT' %}" hx-swap="none">
+                            <label class="btn btn-outline-success" for="p-{{student.id}}">Present</label>
+
+                            <input type="radio" class="btn-check" name="status-{{student.id}}" id="a-{{student.id}}"
+                                hx-post="{% url 'ss:mark' session.id student.id 'ABSENT' %}" hx-swap="none">
+                            <label class="btn btn-outline-danger" for="a-{{student.id}}">Absent</label>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>

@@ -1,0 +1,17 @@
+{% if request.state == "PENDING_MELODY_EXEC" and perms.melody.approve_request %}
+<div class="alert alert-warning border-0 shadow-sm">
+    <h5 class="fw-bold"><i class="bi bi-exclamation-triangle"></i> Approval Required</h5>
+    <p>Please review this Mezemran selection request.</p>
+
+    <form hx-post="{% url 'melody:exec-approve' request.id %}" hx-target="#main-content">
+        <div class="mb-3">
+            <textarea name="comment" class="form-control" placeholder="Required approval comment..."
+                required></textarea>
+        </div>
+        <div class="d-flex gap-2">
+            <button type="submit" name="action" value="APPROVE" class="btn btn-success px-4">Approve</button>
+            <button type="submit" name="action" value="REJECT" class="btn btn-outline-danger">Reject</button>
+        </div>
+    </form>
+</div>
+{% endif %}

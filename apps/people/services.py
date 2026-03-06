@@ -1,7 +1,7 @@
 import datetime
 from django.db import transaction
 from django.conf import settings
-from audit.services import AuditLogger
+from apps.audit.services import AuditLogger
 from ethioqen.calendar_conversion import (
     convert_ethiopian_to_gregorian, 
     convert_gregorian_to_ethiopian

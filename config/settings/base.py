@@ -30,14 +30,14 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "django_htmx",
     # Core Apps
-    "org",
-    "identity",
-    "people",
-    "sundayschool",
-    "melody",
-    "audit",
-    "imports",
-    "reports",
+    "apps.org.apps.OrgConfig",
+    "apps.identity.apps.IdentityConfig",
+    "apps.people.apps.PeopleConfig",
+    "apps.sundayschool.apps.SundayschoolConfig",
+    "apps.melody.apps.MelodyConfig",
+    "apps.audit.apps.AuditConfig",
+    "apps.imports.apps.ImportsConfig",
+    "apps.reports.apps.ReportsConfig",
 ]
 
 MIDDLEWARE = [
@@ -49,6 +49,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "django_htmx.middleware.HtmxMiddleware",
+    "identity.middleware.ForcePasswordChangeMiddleware", # Force password change middleware
 ]
 
 ROOT_URLCONF = "config.urls"
