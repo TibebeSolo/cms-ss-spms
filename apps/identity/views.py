@@ -5,9 +5,23 @@ from django.conf import settings
 from django.contrib import messages
 from .models import UserAccount, AuthEventLog
 from datetime import timedelta
+from django.contrib.auth.views import PasswordChangeView
+from django.urls import reverse_lazy
 
 LOCKOUT_THRESHOLD = 7
 LOCKOUT_TIME_MINUTES = 30
+
+class OnboardingPasswordChangeView(PasswordChangeView):
+    template_name = 'apps/identity/pages/password_change.html'
+    success_url = reverse_lazy('dashboard')
+
+    def form_valid(self, form):
+        # The moment they successfully change the password, they are "onboarded"
+        user = self.request.user
+        user.requires_password_change = False
+        user.save()
+        messages.success(self.request, "Password updated successfully. Welcome to SS-SPMS!")
+        return super().form_valid(form)
 
 def login_view(request):
     if request.method == 'POST':

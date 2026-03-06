@@ -1,19 +1,23 @@
 <!DOCTYPE html>
-<html lang="en" data-bs-theme="light" id="main-html">
+<html lang="en" data-bs-theme="light" id="root-html">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ brand.name|default:"SS-SPMS" }}</title>
+    <title>{% block title %}{{ brand.abbreviation }} | SS-SPMS{% endblock %}</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css">
+
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
 
     <style>
         :root {
+
+            /* Branding Context (Provided by Context Processor) */
             --brand-primary: {
                     {
-                    brand_primary
+                    brand_primary|default: "#1e3a8a"
                 }
             }
 
@@ -21,45 +25,43 @@
 
             --brand-secondary: {
                     {
-                    brand_secondary
+                    brand_secondary|default: "#fbbf24"
                 }
             }
 
             ;
-            /* Lighter variation using color-mix for hover states */
-            --brand-primary-soft: color-mix(in srgb, var(--brand-primary), white 90%);
+
+            /* UI Refinements */
+            --sidebar-width: 280px;
+            --transition-speed: 0.25s;
         }
 
+        /* Dynamic Theme Overrides */
         [data-bs-theme="dark"] {
-            --brand-primary: color-mix(in srgb, {
-                    {
-                    brand_primary
-                }
-            }
-
-            , white 20%);
-        --bg-surface: #121212;
+            --brand-primary-muted: color-mix(in srgb, var(--brand-primary), white 20%);
         }
 
-        .btn-brand-primary {
+        .bg-brand-primary {
+            background-color: var(--brand-primary) !important;
+        }
+
+        .text-brand-secondary {
+            color: var(--brand-secondary) !important;
+        }
+
+        .btn-brand {
             background-color: var(--brand-primary);
             color: white;
             border: none;
+            transition: opacity var(--transition-speed);
         }
 
-        .btn-brand-primary:hover {
-            background-color: color-mix(in srgb, var(--brand-primary), black 15%);
+        .btn-brand:hover {
+            opacity: 0.9;
             color: white;
         }
 
-        /* Modern Sidebar */
-        #sidebar {
-            width: 280px;
-            background: var(--brand-primary);
-            color: white;
-            transition: all 0.3s;
-        }
-
+        /* HTMX Loading State */
         .htmx-indicator {
             display: none;
         }
@@ -67,57 +69,29 @@
         .htmx-request .htmx-indicator {
             display: inline-block;
         }
+
+        .htmx-request.content-fade {
+            opacity: 0.5;
+            transition: opacity 0.2s;
+        }
     </style>
 </head>
 
-<body class="bg-light">
+<body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
 
-    <div class="d-flex" id="wrapper">
-        <nav id="sidebar" class="vh-100 sticky-top shadow">
-            <div class="p-4">
-                {% include "components/brand/logo.html" with type="symbol" %}
-                <hr>
-                <ul class="nav flex-column mt-4">
-                    <li class="nav-item">
-                        <a href="/" class="nav-link text-white opacity-75 hover-opacity-100">Dashboard</a>
-                    </li>
-                    {% if perms.sundayschool.view %}
-                    <li class="nav-item">
-                        <a href="#" hx-get="{% url 'ss:student-list' %}" hx-target="#main-content"
-                            class="nav-link text-white">Students</a>
-                    </li>
-                    {% endif %}
-                </ul>
-            </div>
-        </nav>
-
-        <div class="flex-grow-1">
-            <header class="navbar navbar-expand bg-white shadow-sm px-4 py-2 sticky-top">
-                <div class="container-fluid">
-                    <button id="theme-toggle" class="btn btn-sm btn-outline-secondary">
-                        <i id="theme-icon" class="bi bi-sun"></i> Toggle Dark Mode
-                    </button>
-
-                    <div class="ms-auto d-flex align-items-center">
-                        <span class="me-3 text-muted small">{{ user.username }}</span>
-                        <div class="htmx-indicator spinner-border spinner-border-sm text-primary"></div>
-                    </div>
-                </div>
-            </header>
-
-            <main id="main-content" class="p-4 container-fluid">
-                {% block content %}{% endblock %}
-            </main>
-        </div>
-    </div>
+    {% block layout %}{% endblock %}
 
     <script>
-        // Minimal Dark Mode Logic
-        document.getElementById('theme-toggle').addEventListener('click', () => {
-            const html = document.getElementById('main-html');
-            const current = html.getAttribute('data-bs-theme');
-            html.setAttribute('data-bs-theme', current === 'dark' ? 'light' : 'dark');
-        });
+        const themeToggle = () => {
+            const html = document.getElementById('root-html');
+            const newTheme = html.getAttribute('data-bs-theme') === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-bs-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        };
+        // Persistence
+        if (localStorage.getItem('theme')) {
+            document.getElementById('root-html').setAttribute('data-bs-theme', localStorage.getItem('theme'));
+        }
     </script>
 </body>
 

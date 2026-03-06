@@ -1,0 +1,27 @@
+<tr id="student-row-{{ student.id }}" class="align-middle">
+    <td>
+        <div class="fw-bold">{{ student.christian.first_name }} {{ student.christian.father_name }}</div>
+        <small class="text-muted">{{ student.ssid }}</small>
+    </td>
+    <td>
+        <span
+            class="badge rounded-pill {% if student.is_active %}bg-success-subtle text-success{% else %}bg-secondary-subtle text-secondary{% endif %}">
+            {{ student.status.name }}
+        </span>
+    </td>
+    <td>{{ student.grade.name }} - {{ student.section.name }}</td>
+    <td class="text-end">
+        <div class="btn-group shadow-sm">
+            <button class="btn btn-sm btn-light border" hx-get="{% url 'ss:student-detail' student.id %}"
+                hx-target="#main-content">
+                <i class="bi bi-eye"></i>
+            </button>
+            {% if perms.sundayschool.change_ssstudentprofile %}
+            <button class="btn btn-sm btn-light border" hx-post="{% url 'ss:toggle-status' student.id %}"
+                hx-target="#student-row-{{ student.id }}" hx-swap="outerHTML">
+                <i class="bi bi-arrow-repeat text-brand-secondary"></i>
+            </button>
+            {% endif %}
+        </div>
+    </td>
+</tr>

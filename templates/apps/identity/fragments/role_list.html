@@ -1,0 +1,39 @@
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3>Role Management</h3>
+    <button class="btn btn-brand btn-sm" hx-get="{% url 'identity:role-create' %}" hx-target="#modal-body"
+        data-bs-toggle="modal" data-bs-target="#remoteModal">
+        <i class="bi bi-plus-lg"></i> New Custom Role
+    </button>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-hover align-middle border">
+        <thead class="bg-light">
+            <tr>
+                <th>Role Name</th>
+                <th>Permissions Count</th>
+                <th>System Role?</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for role in roles %}
+            <tr>
+                <td class="fw-bold">{{ role.name }}</td>
+                <td><span class="badge bg-info-subtle text-info">{{ role.permissions.count }} perms</span></td>
+                <td>
+                    {% if role.is_system_role %}
+                    <i class="bi bi-shield-check text-primary"></i>
+                    {% else %}
+                    <i class="bi bi-person-gear text-muted"></i>
+                    {% endif %}
+                </td>
+                <td>
+                    <button class="btn btn-link btn-sm" hx-get="{% url 'identity:role-edit' role.id %}"
+                        hx-target="#main-content">Edit</button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

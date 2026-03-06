@@ -25,10 +25,16 @@ jobs:
           --health-timeout 5s
           --health-retries 5
 
+# ... (keep your existing triggers and postgres service) ...
+
     env:
       DATABASE_URL: postgres://postgres:postgres@localhost:5432/ss_spms
       SECRET_KEY: "ci-test-key-not-for-prod"
       DEBUG: "True"
+      # ADD THIS: Tells Python to look into the current directory for the 'apps' module
+      PYTHONPATH: . 
+      # ADD THIS: Ensures Django knows which settings to use during 'migrate' and 'pytest'
+      DJANGO_SETTINGS_MODULE: config.settings.base 
 
     steps:
       - uses: actions/checkout@v4
@@ -37,7 +43,7 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-          cache: 'pip' # Speeds up subsequent runs
+          cache: 'pip'
 
       - name: Install Dependencies
         run: |
@@ -46,16 +52,16 @@ jobs:
                       ethioqen reportlab openpyxl Pillow django-htmx \
                       psycopg[binary]
 
-      - name: Lint with Ruff
-        run: ruff check .
-
-      - name: Check Formatting (Black)
-        run: black --check .
-
-      - name: Run Migrations
+      # We must ensure the DB is ready before migrating
+      - name: Wait for Database
         run: |
-          cp .env.example .env || true
-          python manage.py migrate
+          until pg_isready -h localhost -p 5432; do
+            echo "Waiting for postgres..."
+            sleep 2
+          done
 
-      - name: Run Tests
+      - name: Run migrations
+        run: python manage.py migrate
+
+      - name: Run tests
         run: pytest

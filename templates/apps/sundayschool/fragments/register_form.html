@@ -1,0 +1,38 @@
+<div class="card border-success shadow-sm">
+    <div class="card-header bg-success text-white">
+        <h5 class="mb-0"><i class="bi bi-person-plus"></i> Complete Student Profile</h5>
+    </div>
+    <div class="card-body">
+        <p class="text-muted">Registering <strong>{{ christian.full_name }}</strong> as a Sunday School Student.</p>
+
+        <form hx-post="{% url 'ss:student-register' christian.id %}" hx-target="#registration-container"
+            hx-indicator="#reg-spinner">
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label class="form-label small fw-bold">Grade/Level</label>
+                    <select name="grade" class="form-select" required>
+                        <option value="">Select Grade...</option>
+                        {% for g in grades %}<option value="{{ g.id }}">{{ g.name }}</option>{% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small fw-bold">Section</label>
+                    <select name="section" class="form-select" required>
+                        <option value="">Select Section...</option>
+                        {% for s in sections %}<option value="{{ s.id }}">{{ s.name }}</option>{% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            {% include "components/forms/eth_date_picker.html" with prefix="joined" label="Date Joined (Ethiopian)" %}
+
+            <div class="mt-4 d-grid">
+                <button type="submit" class="btn btn-success fw-bold">
+                    <span id="reg-spinner" class="htmx-indicator spinner-border spinner-border-sm me-2"></span>
+                    Register Student & Generate SSID
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

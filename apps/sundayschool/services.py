@@ -1,8 +1,9 @@
 from django.db import transaction
 from django.conf import settings
-from .models import SSStudentProfile, AttendanceSession, AttendanceRecord
-from people.services import EthiopianDateService
-from audit.services import AuditLogger
+from .models import SSStudentProfile, AttendanceSession, AttendanceRecord, StudentStatus
+from apps.people.services import EthiopianDateService
+from apps.audit.services import AuditLogger
+from apps.people.models import Christian
 
 class StudentService:
     @staticmethod
@@ -157,4 +158,36 @@ class AttendanceWorkflowService:
             }
         )
 
-     
+# 
+class StudentRegistrationService:
+    @staticmethod
+    @transaction.atomic
+    def register_new_student(christian_id, registration_data, actor_user):
+        """
+        Converts an existing Christian into an SS Student.
+        """
+        christian = Christian.objects.get(id=christian_id)
+        
+        # 1. Create Profile
+        student = SSStudentProfile(
+            christian=christian,
+            grade=registration_data['grade'],
+            section=registration_data['section'],
+            joined_year_eth=registration_data['joined_year_eth'],
+            status=StudentStatus.objects.get(is_default=True),
+            created_by=actor_user
+        )
+        
+        # 2. SSID is auto-generated in the model's save() or via dedicated service
+        # (Referencing your StudentService.generate_ssid logic)
+        student.save() 
+        
+        # 3. Audit Log (Requirement 16)
+        AuditLogger.log(
+            actor=actor_user,
+            action_type="STUDENT_REGISTERED",
+            entity=student,
+            metadata={"ssid": student.ssid, "name": christian.full_name}
+        )
+        
+        return student

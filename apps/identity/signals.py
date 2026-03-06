@@ -1,8 +1,9 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from people.models import Christian
-from sundayschool.models import SSStudentProfile
+from apps.people.models import Christian
+from apps.sundayschool.models import SSStudentProfile
 from .models import UserAccount
+from apps.audit.services import AuditLogger
 
 @receiver(post_save, sender=SSStudentProfile)
 def create_student_user(sender, instance, created, **kwargs):
