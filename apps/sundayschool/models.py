@@ -1,6 +1,7 @@
 from django.db import models
 from django.conf import settings
 from people.models import Christian, ConfessionFather, ContactPerson
+from apps.people.services import EthiopianDateService
 
 # 1. Academic Structure
 class StudentStatus(models.Model):
@@ -50,11 +51,20 @@ class SSStudentProfile(models.Model):
         ('REJECTED', 'Rejected'),
     ]
 
-    christian = models.OneToOneField(Christian, on_delete=models.CASCADE, related_name='ss_profile')
-    ssid = models.CharField(max_length=20, unique=True)
-    joined_year_eth = models.IntegerField()
-    ss_roll_number = models.IntegerField() # 3-digit zero-padded roll, resets yearly
+    christian = models.OneToOneField(
+        Christian, 
+        on_delete=models.PROTECT, 
+        related_name='ss_profile'
+        )
+        
+    # Custom IDs per Requirement
+    # Format: {SSAbbrev}{YY}{RRR} (3-digit roll)
+    ssid = models.CharField(max_length=20, unique=True, editable=False)
+    ss_roll_number = models.IntegerField(editable=False)
     
+    # Ethiopian Year of Joining (entered via UI)
+    joined_year_eth = models.IntegerField()
+
     grade = models.ForeignKey(Grade, on_delete=models.PROTECT)
     section = models.ForeignKey(Section, on_delete=models.PROTECT)
     
@@ -68,9 +78,20 @@ class SSStudentProfile(models.Model):
         null=True, 
         blank=True
     )
+
+    # Requirement 17: No physical deletion
+    is_active = models.BooleanField(default=True)
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def save(self, *args, **kwargs):
+        if not self.ssid:
+            ssid, roll, year = StudentService.generate_ssid(self)
+            self.ssid = ssid
+            self.ss_roll_number = roll
+            self.joined_year_eth = year
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.christian} ({self.ssid})"
@@ -170,6 +191,13 @@ class AttendanceSession(models.Model):
 
     def __str__(self):
         return f"{self.session_date_greg} - {self.scope_type}"
+
+    def save(self, *args, **kwargs):
+        if self.session_date_eth_year and self.session_date_eth_month and self.session_date_eth_day:
+            eth_date_str = f"{self.session_date_eth_year:04d}-{self.session_date_eth_month:02d}-{self.session_date_eth_day:02d}"
+            if EthiopianDateService.validate_ethiopian_date_str(eth_date_str):
+                self.session_date_greg = EthiopianDateService.ethiopian_to_gregorian(eth_date_str)
+        super().save(*args, **kwargs)
 
 class AttendanceRecord(models.Model):
     STATUS_CHOICES = [

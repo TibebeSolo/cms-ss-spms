@@ -5,39 +5,59 @@ on:
     branches: [ main, develop ]
 
 jobs:
+name: CI
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
   test:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: ss_spms
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+    env:
+      DB_NAME: ss_spms
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_HOST: localhost
+      DB_PORT: 5432
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-          
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install ruff black pytest pytest-django django-environ ethioqen reportlab openpyxl Pillow django-htmx psycopg[binary]
-          
+
       - name: Lint with ruff
         run: ruff check .
-        
+
       - name: Check formatting with black
         run: black --check .
-        jobs:
-          test:
-            runs-on: ubuntu-latest
-            services:
-              postgres:
-                image: postgres:16
-                env:
-                  POSTGRES_DB: ss_spms
-                  POSTGRES_USER: postgres
-                  POSTGRES_PASSWORD: postgres
-                ports:
-                  - 5432:5432
-                options: >-
+
+      - name: Copy env file
+        run: cp .env.example .env
+
+      - name: Run migrations
+        run: python manage.py migrate
+
+      - name: Run tests
+        run: pytest
                   --health-cmd="pg_isready -U postgres" \
                   --health-interval=10s \
                   --health-timeout=5s \

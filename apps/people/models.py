@@ -1,4 +1,5 @@
 from django.db import models
+from .services import EthiopianDateService, ChristianService
 
 class RelationshipType(models.Model):
     name = models.CharField(max_length=100, unique=True)
@@ -49,11 +50,33 @@ class Christian(models.Model):
     christian_roll_number = models.IntegerField(null=True, blank=True)
     record_entry_year_eth = models.IntegerField(null=True, blank=True)
     
+    # Requirement 17: No physical deletion
+    is_active = models.BooleanField(default=True)
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"{self.first_name} {self.father_name}"
+
+    def save(self, *args, **kwargs):
+        # 1. Handle Ethiopian Date Conversion
+        if self.dob_eth_year and self.dob_eth_month and self.dob_eth_day:
+            eth_date_str = f"{self.dob_eth_year:04d}-{self.dob_eth_month:02d}-{self.dob_eth_day:02d}"
+            self.dob_greg = EthiopianDateService.ethiopian_to_gregorian(eth_date_str)
+        
+        # 2. Handle Custom ID Generation ({ChurchAbbrev}{YY}{RRRRR})
+        if not self.church_id:
+            # Generate the ID and roll number using the service
+            c_id, roll, year_eth = ChristianService.generate_church_id(self)
+            self.church_id = c_id
+            self.christian_roll_number = roll
+            self.record_entry_year_eth = year_eth
+            
+        super().save(*args, **kwargs)
+    
+    def __str__(self):
+        return f"{self.first_name} {self.father_name} ({self.church_id})"
 
 class ContactPerson(models.Model):
     full_name = models.CharField(max_length=255)
