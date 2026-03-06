@@ -1,0 +1,15 @@
+<tr id="student-{{ student.id }}">
+    <td>{{ student.christian.first_name }}</td>
+    <td>
+        <div class="btn-group btn-group-sm">
+            <button class="btn btn-outline-success" hx-post="{% url 'ss:mark-attendance' student.id 'PRESENT' %}"
+                hx-target="#student-{{ student.id }}" hx-swap="outerHTML">
+                Present
+            </button>
+            <button class="btn btn-outline-danger" hx-post="{% url 'ss:mark-attendance' student.id 'ABSENT' %}"
+                hx-target="#student-{{ student.id }}" hx-swap="outerHTML">
+                Absent
+            </button>
+        </div>
+    </td>
+</tr>

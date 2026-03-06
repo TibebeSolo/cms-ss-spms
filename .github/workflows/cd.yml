@@ -5,19 +5,26 @@ on:
     branches: [ main ]
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
     steps:
       - uses: actions/checkout@v4
       
-      - name: Build Docker image
-        run: docker build -t ss-spms-web:latest .
+      # Step 1: Build & Push (Assuming a Registry like DockerHub or GitHub Packages)
+      # For a simpler 'git pull' setup on-prem, we skip the push and pull directly on the server.
 
-      - name: Deploy via SSH (Documentation)
-        run: |
-          echo "Deployment steps:"
-          echo "1. Connect to production server via SSH"
-          echo "2. Pull latest code/docker image"
-          echo "3. Run 'docker compose -f docker-compose.prod.yml up -d'"
-          echo "4. Run migrations: 'docker compose exec web python manage.py migrate'"
-          # In a real environment, use appleboy/ssh-action or similar
+      - name: Deploy to Production via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /path/to/your/cms-ss-spms
+            git pull origin main
+            docker compose -f docker-compose.prod.yml build
+            docker compose -f docker-compose.prod.yml up -d
+            docker compose -f docker-compose.prod.yml exec -T web python manage.py migrate
+            docker compose -f docker-compose.prod.yml exec -T web python manage.py collectstatic --no-input
