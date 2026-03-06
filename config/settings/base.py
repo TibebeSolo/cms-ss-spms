@@ -64,6 +64,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "org.context_processors.branding", # Branding Context processors
             ],
         },
     },
@@ -94,6 +95,12 @@ AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
+]
+
+# Authentication Backends
+AUTHENTICATION_BACKENDS = [
+    'identity.auth_backends.SS_SPMS_Backend',  # Custom role-based logic
+    'django.contrib.auth.backends.ModelBackend',   # Fallback
 ]
 
 # Internationalization

@@ -3,17 +3,13 @@ name: CI
 on:
   pull_request:
     branches: [ main, develop ]
-
-jobs:
-name: CI
-
-on:
-  pull_request:
+  push:
     branches: [ main, develop ]
 
 jobs:
   test:
     runs-on: ubuntu-latest
+    
     services:
       postgres:
         image: postgres:16
@@ -24,67 +20,42 @@ jobs:
         ports:
           - 5432:5432
         options: >-
-          --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     env:
-      DB_NAME: ss_spms
-      DB_USER: postgres
-      DB_PASSWORD: postgres
-      DB_HOST: localhost
-      DB_PORT: 5432
+      DATABASE_URL: postgres://postgres:postgres@localhost:5432/ss_spms
+      SECRET_KEY: "ci-test-key-not-for-prod"
+      DEBUG: "True"
+
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: Set up Python 3.12
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+          cache: 'pip' # Speeds up subsequent runs
 
-      - name: Install dependencies
+      - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install ruff black pytest pytest-django django-environ ethioqen reportlab openpyxl Pillow django-htmx psycopg[binary]
+          pip install ruff black pytest pytest-django django-environ \
+                      ethioqen reportlab openpyxl Pillow django-htmx \
+                      psycopg[binary]
 
-      - name: Lint with ruff
+      - name: Lint with Ruff
         run: ruff check .
 
-      - name: Check formatting with black
+      - name: Check Formatting (Black)
         run: black --check .
 
-      - name: Copy env file
-        run: cp .env.example .env
+      - name: Run Migrations
+        run: |
+          cp .env.example .env || true
+          python manage.py migrate
 
-      - name: Run migrations
-        run: python manage.py migrate
-
-      - name: Run tests
+      - name: Run Tests
         run: pytest
-                  --health-cmd="pg_isready -U postgres" \
-                  --health-interval=10s \
-                  --health-timeout=5s \
-                  --health-retries=5
-            steps:
-              - uses: actions/checkout@v4
-              - name: Set up Python
-                uses: actions/setup-python@v5
-                with:
-                  python-version: '3.12'
-              - name: Install dependencies
-                run: |
-                  python -m pip install --upgrade pip
-                  pip install ruff black pytest pytest-django django-environ ethioqen reportlab openpyxl Pillow django-htmx psycopg[binary]
-              - name: Lint with ruff
-                run: ruff check .
-              - name: Check formatting with black
-                run: black --check .
-              - name: Prepare .env
-                run: cp .env.example .env
-              - name: Wait for Postgres
-                run: |
-                  for i in {1..10}; do
-                    pg_isready -h localhost -p 5432 && break
-                    sleep 2
-                  done
-              - name: Run migrations
-                run: python manage.py migrate
-              - name: Run tests
-                run: pytest

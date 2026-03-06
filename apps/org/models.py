@@ -18,7 +18,16 @@ class SundaySchool(models.Model):
     name = models.CharField(max_length=255)
     abbreviation = models.CharField(max_length=10, help_text="Used for SSID/MZID generation")
     phone = models.CharField(max_length=20)
-    logo = models.ImageField(upload_to='org/logos/', null=True, blank=True)
+   
+    # Branding - State of the Art Technique: Store Hex/HSL
+    primary_color = models.CharField(max_length=7, default="#1e3a8a", help_text="Hex code for primary brand")
+    secondary_color = models.CharField(max_length=7, default="#fbbf24", help_text="Hex code for secondary brand")
+    
+    # Multi-Logo Strategy
+    primary_logo = models.ImageField(upload_to='org/logos/', null=True, blank=True, help_text="Full logo for headers")
+    symbol_logo = models.ImageField(upload_to='org/logos/', null=True, blank=True, help_text="Small symbol for sidebar/favicon")
+    
+    is_active = models.BooleanField(default=True)
     
     # Social links as a simple JSON or separate model; implementation_plan 2.1 says SocialLink
     

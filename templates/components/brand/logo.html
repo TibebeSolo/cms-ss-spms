@@ -1,0 +1,5 @@
+{% if type == "symbol" %}
+<img src="{{ brand.symbol_logo.url }}" alt="Symbol" style="height: 40px; width: auto;">
+{% else %}
+<img src="{{ brand.primary_logo.url }}" alt="{{ brand.name }}" class="img-fluid">
+{% endif %}
