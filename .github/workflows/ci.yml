@@ -28,13 +28,18 @@ jobs:
 # ... (keep your existing triggers and postgres service) ...
 
     env:
+      # These are what your base.py is currently looking for:
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_HOST: localhost
+      DB_PORT: 5432
+      DB_NAME: ss_spms
+      # Keep this as well for general compatibility
       DATABASE_URL: postgres://postgres:postgres@localhost:5432/ss_spms
       SECRET_KEY: "ci-test-key-not-for-prod"
       DEBUG: "True"
-      # ADD THIS: Tells Python to look into the current directory for the 'apps' module
-      PYTHONPATH: . 
-      # ADD THIS: Ensures Django knows which settings to use during 'migrate' and 'pytest'
-      DJANGO_SETTINGS_MODULE: config.settings.base 
+      PYTHONPATH: .
+      DJANGO_SETTINGS_MODULE: config.settings.base
 
     steps:
       - uses: actions/checkout@v4
