@@ -1,0 +1,32 @@
+<table class="table table-hover align-middle">
+    <thead class="table-light">
+        <tr>
+            <th>Login ID (SSID)</th>
+            <th>Officer Name</th>
+            <th>System Role</th>
+            <th>Account Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for officer in officers %}
+        <tr>
+            <td>
+                <span class="badge bg-dark font-monospace">{{ officer.username }}</span>
+            </td>
+            <td>{{ officer.get_full_name }}</td>
+            <td>
+                {% for ur in officer.user_roles.all %}
+                <span class="badge bg-brand-primary">{{ ur.role.name }}</span>
+                {% endfor %}
+            </td>
+            <td>
+                {% if officer.requires_password_change %}
+                <span class="text-warning small"><i class="bi bi-clock"></i> Needs Password Change</span>
+                {% else %}
+                <span class="text-success small"><i class="bi bi-check-circle"></i> Active</span>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>

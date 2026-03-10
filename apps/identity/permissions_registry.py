@@ -13,5 +13,9 @@ class AppPermissions:
 
     @classmethod
     def as_choices(cls):
-        return [(value, value.replace(':', ' ').title()) 
-                for key, value in cls.__dict__.items() if not key.startswith('__') and not callable(value)]
+        choices = []
+        for key, value in cls.__dict__.items():
+            # Only pick up upper-case constants that are strings
+            if key.isupper() and isinstance(value, str):
+                choices.append((value, value.replace(':',' ').title()))
+        return choices

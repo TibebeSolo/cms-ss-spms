@@ -16,3 +16,7 @@ class SS_SPMS_Backend(ModelBackend):
             return True
             
         return perm in user_perms
+    
+    # Optional: Overwrite this to stop Superusers from having all perms by default
+    # def get_all_permissions(self, user_obj, obj=None):
+    #     return Permission.objects.filter(roles__user_roles__user=user_obj).values_list('code', flat=True)
