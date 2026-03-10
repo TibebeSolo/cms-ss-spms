@@ -1,9 +1,9 @@
 from django.db import transaction
 from django.conf import settings
 from .models import SSStudentProfile, AttendanceSession, AttendanceRecord, StudentStatus
-from apps.people.services import EthiopianDateService
-from apps.audit.services import AuditLogger
-from apps.people.models import Christian
+from people.services import EthiopianDateService
+from audit.services import AuditLogger
+from people.models import Christian
 
 class StudentService:
     @staticmethod

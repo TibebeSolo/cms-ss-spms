@@ -1,7 +1,7 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from .models import SSStudentProfile
-from apps.identity.models import UserAccount
+from identity.models import UserAccount
 
 @receiver(post_save, sender=SSStudentProfile)
 def create_student_user(sender, instance, created, **kwargs):

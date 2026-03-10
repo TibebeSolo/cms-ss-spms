@@ -5,7 +5,7 @@ class RelationshipType(models.Model):
     name = models.CharField(max_length=100, unique=True)
 
     class Meta:
-        app_label = 'people'
+        pass
 
     def __str__(self):
         return self.name
@@ -17,7 +17,7 @@ class ConfessionFather(models.Model):
     residence = models.TextField()
 
     class Meta:
-        app_label = 'people'
+        pass
     
     def __str__(self):
         return self.full_name
@@ -82,7 +82,7 @@ class Christian(models.Model):
         super().save(*args, **kwargs)
     
     class Meta:
-        app_label = 'people'
+        pass
 
     def __str__(self):
         return f"{self.first_name} {self.father_name} ({self.church_id})"
@@ -101,7 +101,7 @@ class ContactPerson(models.Model):
     )
 
     class Meta:
-        app_label = 'people'
+        pass
 
     def __str__(self):
         return self.full_name

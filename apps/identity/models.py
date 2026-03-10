@@ -25,7 +25,7 @@ class UserAccount(AbstractUser):
         return False
 
     class Meta:
-        app_label = "identity"
+       pass
 
     def __str__(self):
         return self.username

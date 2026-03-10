@@ -13,21 +13,15 @@ def dashboard_view(request):
 urlpatterns = [
     path('admin/', admin.site.urls),
 
-    # Authentication Routing
-    path('login/', auth_views.LoginView.as_view(
-        template_name='apps/identity/pages/login.html',
-        redirect_authenticated_user=True
-    ), name='login'),
+    # The Identity App
+    path('identity/', include('identity.urls', namespace='identity')),
     
-    path('logout/', auth_views.LogoutView.as_view(
-        next_page='login'
-    ), name='logout'),
+    # Other Apps
+    # path('people/', include('apps.people.urls', namespace='people')),
+    path('ss/', include('sundayschool.urls', namespace='sundayschool')),
 
-    # Forced Password Reset / Change (Requirement from Context)
-    path('password-change/', auth_views.PasswordChangeView.as_view(
-        template_name='apps/identity/pages/password_change.html',
-        success_url='/'
-    ), name='password_change'),
+    # Logout Redirection
+    path('logout/', auth_views.LogoutView.as_view(next_page='identity:login'), name='logout'),
 
     # Dashboard / Entry Point
     path('', dashboard_view, name='dashboard'),
