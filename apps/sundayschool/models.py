@@ -1,7 +1,7 @@
 from django.db import models
 from django.conf import settings
-from apps.people.models import Christian, ConfessionFather, ContactPerson
-from apps.people.services import EthiopianDateService
+from people.models import Christian, ConfessionFather, ContactPerson
+from people.services import EthiopianDateService
 
 # 1. Academic Structure
 class StudentStatus(models.Model):

@@ -3,7 +3,7 @@ import io
 from django.utils import timezone
 from django.db import transaction
 from .models import ImportRun, ImportRowError
-from apps.audit.services import AuditLogger # From Step 5
+from audit.services import AuditLogger # From Step 5
 
 class DataImportService:
     @staticmethod

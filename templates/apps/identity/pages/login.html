@@ -1,6 +1,6 @@
 {% extends "layouts/base.html" %}
 
-{% block content %}
+{% block layout %}
 <div class="d-flex align-items-center justify-content-center min-vh-100 bg-light-subtle">
     <div class="card shadow-lg border-0" style="width: 400px; border-top: 5px solid var(--brand-primary) !important;">
         <div class="card-body p-5">
@@ -10,13 +10,14 @@
                 <p class="text-muted small">{{ brand.name }} Management System</p>
             </div>
 
-            <form hx-post="{% url 'login' %}" hx-target="body" hx-indicator="#login-spinner" class="needs-validation">
+            <form hx-post="{% url 'identity:login' %}" hx-target="body" hx-indicator="#login-spinner"
+                class="needs-validation">
                 {% csrf_token %}
 
                 <div class="mb-3">
                     <label class="form-label small fw-bold">SSID or Church ID</label>
                     <input type="text" name="username" class="form-control form-control-lg fs-6"
-                        placeholder="e.g. SS24001" required>
+                        placeholder="e.g. SS18001" required>
                 </div>
 
                 <div class="mb-4">

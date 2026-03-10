@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from django.views.generic import View
-from apps.people.models import Christian
+from people.models import Christian
 from .models import Grade, Section
 from .services import StudentRegistrationService
 
@@ -29,3 +29,11 @@ class StudentRegisterView(View):
         
         # Return success state (HTMX partial)
         return render(request, 'apps/sundayschool/fragments/registration_success.html', {'student': student})
+
+class StudentListView(View):
+    def get(self, request):
+        students = SSStudentProfile.objects.all()
+        context = {
+            'students': students,
+        }
+        return render(request, 'apps/sundayschool/fragments/student_list.html', context)

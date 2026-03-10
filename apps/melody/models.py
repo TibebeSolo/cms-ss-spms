@@ -1,6 +1,6 @@
 from django.db import models
 from django.conf import settings
-from apps.sundayschool.models import SSStudentProfile
+from sundayschool.models import SSStudentProfile
 
 class MezemranMembership(models.Model):
     STATUS_CHOICES = [

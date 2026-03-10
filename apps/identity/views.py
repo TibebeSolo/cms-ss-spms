@@ -54,7 +54,7 @@ def login_view(request):
                 ip_address=ip,
                 user_agent=ua,
             )
-            return redirect('/')
+            return redirect('dashboard')
         else:
             if user:
                 user.failed_login_count += 1
@@ -85,4 +85,4 @@ def login_view(request):
                     user_agent=ua,
                 )
             messages.error(request, "Invalid credentials.")
-    return render(request, 'login.html')
+    return render(request, 'apps/identity/pages/login.html')

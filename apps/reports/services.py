@@ -2,7 +2,7 @@ from sundayschool.models import SSStudentProfile, AttendanceRecord, AttendanceSe
 from melody.models import MezemranMembership
 from .models import GeneratedReport
 from .utils.pdf_engine import EOTCPDFBuilder
-from apps.audit.services import AuditLogger
+from audit.services import AuditLogger
 import openpyxl
 
 class AttendanceReportService:

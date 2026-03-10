@@ -30,14 +30,14 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "django_htmx",
     # Core Apps
-    "apps.org.apps.OrgConfig",
-    "apps.identity.apps.IdentityConfig",
-    "apps.people.apps.PeopleConfig",
-    "apps.sundayschool.apps.SundayschoolConfig",
-    "apps.melody.apps.MelodyConfig",
-    "apps.audit.apps.AuditConfig",
-    "apps.imports.apps.ImportsConfig",
-    "apps.reports.apps.ReportsConfig",
+    "org.apps.OrgConfig",
+    "identity.apps.IdentityConfig",
+    "people.apps.PeopleConfig",
+    "sundayschool.apps.SundayschoolConfig",
+    "melody.apps.MelodyConfig",
+    "audit.apps.AuditConfig",
+    "imports.apps.ImportsConfig",
+    "reports.apps.ReportsConfig",
 ]
 
 MIDDLEWARE = [
@@ -53,6 +53,9 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = "config.urls"
+
+# Auth
+AUTH_USER_MODEL = "identity.UserAccount"
 
 TEMPLATES = [
     {
@@ -70,6 +73,15 @@ TEMPLATES = [
         },
     },
 ]
+
+# Tell Django where your ACTUAL login page lives
+LOGIN_URL = 'identity:login'
+
+# Tell Django where to go after a successful login
+LOGIN_REDIRECT_URL = 'dashboard'
+
+# Tell Django where to go after logging out
+LOGOUT_REDIRECT_URL = 'identity:login'
 
 WSGI_APPLICATION = "config.wsgi.application"
 
@@ -105,7 +117,7 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 # Internationalization
-LANGUAGE_CODE = "am"
+LANGUAGE_CODE = "en"
 LANGUAGES = [
     ("am", "Amharic"),
     ("en", "English"),
@@ -125,9 +137,6 @@ MEDIA_ROOT = BASE_DIR / "media"
 # Default primary key field type
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# Auth
-AUTH_USER_MODEL = "identity.UserAccount"
-
 # Project Specific
-CHURCH_ABBREV = env("CHURCH_ABBREV", default="AB")
+CHURCH_ABBREV = env("CHURCH_ABBREV", default="HS")
 SS_ABBREV = env("SS_ABBREV", default="ABSS")
