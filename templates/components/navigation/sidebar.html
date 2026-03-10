@@ -11,9 +11,13 @@
 
             {% if perms.sundayschool.view_ssstudentprofile %}
             <div class="mt-4 small text-uppercase opacity-50 px-3 fw-bold">Management</div>
+            <a href="{% url 'sundayschool:student-register' %}"
+                class="nav-link text-white d-flex align-items-center gap-3 rounded px-3 py-2">
+                <i class="bi bi-person-plus-fill"></i> New Registration
+            </a>
             <a href="{% url 'sundayschool:student-list' %}"
                 class="nav-link text-white d-flex align-items-center gap-3 rounded px-3 py-2">
-                <i class="bi bi-people"></i> Students
+                <i class="bi bi-people"></i> Students List
             </a>
             <a href="{% url 'sundayschool:attendance' %}"
                 class="nav-link text-white d-flex align-items-center gap-3 rounded px-3 py-2">
@@ -31,8 +35,9 @@
 
             {% if perms.identity.all %}
             <div class="mt-auto pt-4 border-top border-white border-opacity-10">
-                <a href="/admin/roles/" class="nav-link text-white d-flex align-items-center gap-3 rounded px-3 py-2">
-                    <i class="bi bi-shield-lock"></i> Permissions
+                <a href="{% url 'identity:sys_dashboard' %}"
+                    class="nav-link text-white d-flex align-items-center gap-3 rounded px-3 py-2">
+                    <i class="bi bi-gear-fill"></i> System Admin
                 </a>
             </div>
             {% endif %}

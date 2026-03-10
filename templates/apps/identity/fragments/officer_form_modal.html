@@ -1,0 +1,23 @@
+<div class="modal-header bg-light">
+    <h5 class="modal-title fw-bold">Register New Officer</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+</div>
+<form hx-post="{% url 'identity:officer_create' %}" hx-target="#modal-content">
+    {% csrf_token %}
+    <div class="modal-body">
+        <div class="row g-3">
+            <div class="col-12">{{ form.username.label_tag }}{{ form.username }}</div>
+            <div class="col-md-6">{{ form.first_name.label_tag }}{{ form.first_name }}</div>
+            <div class="col-md-6">{{ form.last_name.label_tag }}{{ form.last_name }}</div>
+            <div class="col-12">{{ form.email.label_tag }}{{ form.email }}</div>
+            <div class="col-12">
+                <label class="fw-bold text-brand-primary">Assign System Role</label>
+                {{ form.role }}
+                <div class="form-text small">This determines what the officer can see in the sidebar.</div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-brand w-100">Register & Generate Password</button>
+    </div>
+</form>

@@ -1,0 +1,40 @@
+<div class="modal-header bg-light">
+    <h5 class="modal-title fw-bold">{% if role %}Edit Role: {{ role.name }}{% else %}Create New Role{% endif %}</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+</div>
+<form hx-post="{% if role %}{% url 'identity:role_edit' role.pk %}{% else %}{% url 'identity:role_create' %}{% endif %}"
+    hx-target="#role-table-container" hx-swap="innerHTML">
+    {% csrf_token %}
+    <div class="modal-body">
+        <div class="mb-3">
+            {{ form.name.label_tag }}
+            {{ form.name }}
+        </div>
+        <div class="mb-3">
+            {{ form.description.label_tag }}
+            {{ form.description }}
+        </div>
+
+        <label class="fw-bold mb-2 mt-3">Assign Permissions</label>
+        <div class="row g-3 border rounded p-3 bg-light-subtle" style="max-height: 300px; overflow-y: auto;">
+            {% for perm in all_perms %}
+            <div class="col-md-6">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="permissions" value="{{ perm.id }}"
+                        id="perm_{{ perm.id }}" {% if perm in form.instance.permissions.all %}checked{% endif %}>
+                    <label class="form-check-label small" for="perm_{{ perm.id }}">
+                        <code class="text-brand-primary">{{ perm.code }}</code><br>
+                        <span class="text-muted">{{ perm.description }}</span>
+                    </label>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-brand btn-sm" data-bs-dismiss="modal">
+            {% if role %}Save Changes{% else %}Create Role{% endif %}
+        </button>
+    </div>
+</form>

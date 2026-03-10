@@ -163,13 +163,11 @@ class StudentRegistrationService:
     @staticmethod
     @transaction.atomic
     def register_new_student(christian_id, registration_data, actor_user):
-        """
-        Converts an existing Christian into an SS Student.
-        """
-        christian = Christian.objects.get(id=christian_id)
+        # 1. Create Christian record
+        christian = Christian.objects.create(**christian_data)
         
         # 1. Create Profile
-        student = SSStudentProfile(
+        student = SSStudentProfile.objects.create(
             christian=christian,
             grade=registration_data['grade'],
             section=registration_data['section'],
@@ -180,14 +178,31 @@ class StudentRegistrationService:
         
         # 2. SSID is auto-generated in the model's save() or via dedicated service
         # (Referencing your StudentService.generate_ssid logic)
+        ssid, roll, year = StudentService.generate_ssid(student)
         student.save() 
+
+        # 3. IF a Role is selected -> It's an Officer
+        temp_pwd = None
+        if role:
+            temp_pwd = generate_default_password()
+            user = UserAccount.objects.create_user(
+                username=student.ssid, # Login with SSID
+                password=temp_pwd,
+                email=christian.email or "",
+                first_name=christian.first_name,
+                last_name=christian.father_name,
+                is_staff=True,
+                requires_password_change=True
+            )
+            UserRole.objects.create(user=user, role=role)
         
-        # 3. Audit Log (Requirement 16)
+        # 4. Audit Log (Requirement 16)
         AuditLogger.log(
             actor=actor_user,
             action_type="STUDENT_REGISTERED",
             entity=student,
-            metadata={"ssid": student.ssid, "name": christian.full_name}
+
+            metadata={"ssid": student.ssid, "name": christian.full_name, "role": role}
         )
         
-        return student
+        return student, temp_pwd
