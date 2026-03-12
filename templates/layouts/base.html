@@ -5,29 +5,49 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}{{ brand.abbreviation|default:"SS" }} | SPMS{% endblock %}</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css">
-    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
-
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'vendor/bootstrap/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'vendor/bootstrap-icons/bootstrap-icons.min.css' %}">
+    <script src="{% static 'vendor/htmx/htmx.min.js' %}"></script>
+    <script src="{% static 'vendor/bootstrap/bootstrap.bundle.min.js' %}"></script>
     <style>
-        :root {
+        @font-face {
+            font-family: 'Inter';
+            src:url("{% static 'fonts/inter/inter-400.woff2' %}") format('woff2');
+            font-weight: 400;
+            font-style: normal;
+        }
 
-            /* Better CSS variable injection */
+        @font-face {
+            font-family: 'Inter';
+            src:url("{% static 'fonts/inter/inter-500.woff2' %}") format('woff2');
+            font-weight: 500;
+            font-style: normal;
+        }
+
+        @font-face {
+            font-family: 'Inter';
+            src:url("{% static 'fonts/inter/inter-600.woff2' %}") format('woff2');
+            font-weight: 600;
+            font-style: normal;
+        }
+
+        @font-face {
+            font-family: 'Inter';
+            src:url("{% static 'fonts/inter/inter-700.woff2' %}") format('woff2');
+            font-weight: 700;
+            font-style: normal;
+        }
+
+        :root {
             --brand-primary: {
-                    {
-                    brand_primary|default: "#1e3a8a"
-                }
+                % firstof brand_primary "#1e3a8a" %
             }
 
             ;
 
             --brand-secondary: {
-                    {
-                    brand_secondary|default: "#fbbf24"
-                }
+                % firstof brand_secondary "#fbbf24" %
             }
 
             ;
@@ -37,94 +57,75 @@
             -apple-system,
             sans-serif;
             --glass-bg: rgba(255, 255, 255, 0.7);
-            --glass-border: rgba(255, 255, 255, 0.3);
+            --glass-border: rgba(0, 0, 0, 0.1);
             --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        [data-bs-theme="dark"] {
-            --glass-bg: rgba(33, 37, 41, 0.7);
-            --glass-border: rgba(255, 255, 255, 0.1);
         }
 
         body {
             font-family: var(--font-family);
             color: var(--bs-body-color);
             background-color: var(--bs-body-bg);
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
         }
 
-        .bg-brand-primary {
-            background-color: var(--brand-primary) !important;
-            color: white !important;
+        .bg-brand-primary,
+        .card-header.bg-brand-primary {
+            background-color: var(--brand-primary, #1e3a8a) !important;
+            color: #ffffff !important;
+            border: none !important;
         }
 
         .text-brand-primary {
-            color: var(--brand-primary) !important;
+            color: var(--brand-primary, #1e3a8a) !important;
         }
 
         .btn-brand {
-            background-color: var(--brand-primary);
-            color: white;
-            border: none;
+            background-color: var(--brand-primary, #1e3a8a) !important;
+            color: #ffffff !important;
+            border: 1px solid rgba(0, 0, 0, 0.1) !important;
             transition: var(--transition-smooth);
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
         .btn-brand:hover {
-            background-color: color-mix(in srgb, var(--brand-primary), black 15%);
-            color: white;
+            background-color: color-mix(in srgb, var(--brand-primary, #1e3a8a), black 15%) !important;
+            color: white !important;
             transform: translateY(-1px);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         }
 
-        /* Modern Utilities */
         .glass-panel {
             background: var(--glass-bg);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             border: 1px solid var(--glass-border);
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.07);
         }
 
-        .content-fade {
-            animation: fadeIn 0.4s ease-out;
+        .bg-body {
+            background-color: #f8fafc !important;
         }
 
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .text-muted-custom {
+            color: #64748b !important;
         }
 
-        /* Fixed: Light mode text visibility */
-        [data-bs-theme="light"] .text-muted-custom {
-            color: #6c757d !important;
-        }
-
-        [data-bs-theme="dark"] .text-muted-custom {
-            color: #adb5bd !important;
+        .input-group-text {
+            background-color: var(--bs-tertiary-bg);
+            border-color: var(--bs-border-color);
+            color: var(--bs-body-color);
         }
     </style>
 </head>
 
-<body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+<body>
     {% block layout %}{% endblock %}
-
     <script>
-        // Simple theme toggle
-        function themeToggle() {
-            const html = document.documentElement;
-            const theme = html.getAttribute('data-bs-theme') === 'dark' ? 'light' : 'dark';
-            html.setAttribute('data-bs-theme', theme);
-            localStorage.setItem('theme', theme);
-        }
-        if (localStorage.getItem('theme')) document.documentElement.setAttribute('data-bs-theme', localStorage.getItem('theme'));
+        document.body.addEventListener('htmx:configRequest', (event) => {
+            event.detail.headers['X-CSRFToken'] = '{{ csrf_token }}';
+        });
     </script>
+    {% block extra_js %}{% endblock %}
 </body>
 
 </html>

@@ -1,8 +1,3 @@
-{#
-Usage Example:
-{% include "components/forms/eth_date_picker.html" with prefix="dob" label="Date of Birth (Eth)" %}
-#}
-
 <div class="eth-date-picker mb-3" id="picker-{{ prefix }}">
     <div class="d-flex justify-content-between align-items-end mb-1">
         <label class="form-label fw-bold small text-muted text-uppercase mb-0">{{ label|default:"Ethiopian Date"
@@ -14,8 +9,8 @@ Usage Example:
     </div>
 
     <div class="input-group shadow-sm">
-        <input type="number" class="form-control text-center" name="eth_day" placeholder="Day" min="1" max="30"
-            hx-get="{% url 'people:hx-convert-eth-date' %}"
+        <input type="number" class="form-control text-center" name="{{ prefix }}_day" id="{{ prefix }}_day"
+            placeholder="Day" min="1" max="30" hx-get="{% url 'people:hx-convert-eth-date' %}"
             hx-include="#picker-{{ prefix }} input, #picker-{{ prefix }} select" hx-target="#greg-feedback-{{ prefix }}"
             hx-trigger="keyup delay:400ms changed, change">
 
@@ -53,20 +48,16 @@ Usage Example:
 
 {% if show_today_btn %}
 <script>
-    // A simple helper to populate current Ethiopian date (You can inject exact server-side Eth date here if preferred)
     function setEthToday_{ { prefix } } () {
-        // Assuming your backend passes current_eth_day, month, year into context for the dashboard
         document.getElementById('{{ prefix }}_day').value = '{{ current_eth_day|default:"" }}';
         document.getElementById('{{ prefix }}_month').value = '{{ current_eth_month|default:"" }}';
         document.getElementById('{{ prefix }}_year').value = '{{ current_eth_year|default:"" }}';
-        // Trigger HTMX update manually
         htmx.trigger('#{{ prefix }}_day', 'change');
     }
 </script>
 {% endif %}
 
 <style>
-    /* Slight visual polish for the picker */
     .eth-date-picker .form-control:focus,
     .eth-date-picker .form-select:focus {
         border-color: var(--brand-primary);
