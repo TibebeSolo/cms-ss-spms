@@ -4,7 +4,7 @@ from .models import (
 )
 from people.services import EthiopianDateService
 from audit.services import AuditLogger
-from people.models import Christian, ConfessionFather
+from people.models import Christian
 from identity.models import UserAccount, UserRole, Role
 from django.db import transaction
 from django.conf import settings
@@ -23,17 +23,19 @@ class StudentService:
         ss = SundaySchool.objects.filter(is_active=True).first()
         ss_abbrev = ss.abbreviation if ss else "SS"
 
-        year = instance.joined_year_eth or EthiopianDateService.get_current_eth_year()
+        year = instance.joined_year_eth
         year_yy = str(year)[-2:]
 
         # Lock rows for this specific joined year to ensure unique roll assignment
-        last_student = SSStudentProfile.objects.filter(
-            joined_year_eth=year
-        ).select_for_update().order_by('-ss_roll_number').first()
+        last_roll = (
+            SSStudentProfile.objects
+            .select_for_update()
+            .aggregate(Max("ss_roll_number"))["ss_roll_number__max"]
+        )
 
-        roll = (last_student.ss_roll_number + 1) if last_student else 1
+        roll = (last_roll or 0) + 1
         
-        ssid = f"{ss_abbrev}{year_yy}{roll:03d}"
+        ssid = f"{ss_abbrev}{year_yy}{roll:04d}"
 
         if actor:
             AuditLogger.log(

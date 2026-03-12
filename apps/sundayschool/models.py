@@ -1,6 +1,6 @@
 from django.db import models
 from django.conf import settings
-from people.models import Christian, ConfessionFather, ContactPerson
+from people.models import Christian, ContactPerson
 from people.services import EthiopianDateService
 
 # 1. Academic Structure
@@ -59,8 +59,13 @@ class SSStudentProfile(models.Model):
         
     # Custom IDs per Requirement
     # Format: {SSAbbrev}{YY}{RRR} (3-digit roll)
-    ssid = models.CharField(max_length=20, unique=True, editable=False)
-    ss_roll_number = models.IntegerField(editable=False)
+    ssid = models.CharField(
+        max_length=20, 
+        unique=True, 
+        editable=False,
+        db_index=True
+        )
+    ss_roll_number = models.PositiveIntegerField(unique=True)
     
     # Ethiopian Year of Joining (entered via UI)
     joined_year_eth = models.IntegerField()
@@ -73,11 +78,12 @@ class SSStudentProfile(models.Model):
     profile_update_state = models.CharField(max_length=20, blank=True)
     
     confession_father = models.ForeignKey(
-        ConfessionFather, 
-        on_delete=models.SET_NULL, 
-        null=True, 
-        blank=True
-    )
+    Christian,
+    on_delete=models.SET_NULL,
+    null=True,
+    blank=True,
+    related_name="confessed_students"
+)
 
     # Requirement 17: No physical deletion
     is_active = models.BooleanField(default=True)
@@ -87,10 +93,11 @@ class SSStudentProfile(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.ssid:
-            ssid, roll, year = StudentService.generate_ssid(self)
+            ssid, roll = StudentService.generate_ssid(
+                joined_year=self.joined_year_eth
+            )
             self.ssid = ssid
             self.ss_roll_number = roll
-            self.joined_year_eth = year
         super().save(*args, **kwargs)
 
     def __str__(self):
