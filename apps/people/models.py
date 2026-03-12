@@ -10,18 +10,6 @@ class RelationshipType(models.Model):
     def __str__(self):
         return self.name
 
-class ConfessionFather(models.Model):
-    full_name = models.CharField(max_length=255)
-    phone = models.CharField(max_length=20)
-    servant_church = models.CharField(max_length=255)
-    residence = models.TextField()
-
-    class Meta:
-        pass
-    
-    def __str__(self):
-        return self.full_name
-
 class Christian(models.Model):
     SEX_CHOICES = [
         ('M', 'Male'),
@@ -40,8 +28,8 @@ class Christian(models.Model):
     dob_eth_day = models.IntegerField(null=True, blank=True)
     dob_greg = models.DateField(null=True, blank=True)
     
-    phone = models.CharField(max_length=20, null=True, blank=True)
-    email = models.EmailField(null=True, blank=True)
+    phone = models.CharField(max_length=20, unique=True)
+    email = models.EmailField(unique=True, null=True, blank=True)
     
     # Address
     region = models.CharField(max_length=100, blank=True)

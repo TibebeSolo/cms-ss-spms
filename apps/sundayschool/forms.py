@@ -1,5 +1,5 @@
 from django import forms
-from people.models import Christian, ConfessionFather
+from people.models import Christian
 from identity.models import Role
 from .models import Grade, Section
 
