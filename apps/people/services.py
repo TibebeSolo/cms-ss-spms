@@ -37,11 +37,14 @@ class EthiopianDateService:
 class ChristianService:
     @staticmethod
     @transaction.atomic
-    def generate_church_id(instance):
+    def generate_church_id(instance, actor=None):
         from .models import Christian
+        from org.models import Parish
         
-        # Get prefix from settings (e.g., 'AB')
-        prefix = getattr(settings, 'CHURCH_ABBREV', 'CH')
+        # Get prefix from Parish (e.g., 'AB')
+        parish = Parish.objects.first() # MVP: only one parish
+        prefix = parish.church_abbrev if parish else "CH"
+
         year = EthiopianDateService.get_current_eth_year()
         year_yy = str(year)[-2:]
         
@@ -53,16 +56,16 @@ class ChristianService:
         roll = (last_rec.christian_roll_number + 1) if last_rec else 1
         generated_id = f"{prefix}{year_yy}{roll:05d}"
 
-        AuditLogger.log(
-            actor=instance.user,
-            action_type="CHRISTIAN_ID_GENERATED",
-            entity=instance,
-            metadata={
-                "christian_id": generated_id,
-                "christian_name": instance.first_name + " " + instance.father_name,
-                "roll_number": roll,
-                "entry_year": year
-            }
-        )
+        if actor:
+            AuditLogger.log(
+                actor=actor,
+                action_type="CHRISTIAN_ID_GENERATED",
+                entity=instance,
+                metadata={
+                    "christian_id": generated_id,
+                    "roll_number": roll,
+                    "entry_year": year
+                }
+            )
         
         return generated_id, roll, year

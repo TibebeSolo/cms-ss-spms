@@ -19,12 +19,11 @@ class DataImportService:
         )
         
         if import_type == 'ATTENDANCE':
-            from sundayschool.services import AttendanceImportBridge
             # 1. Parse rows into a list of dicts
             rows = DataImportService._parse_file_to_list(file_obj)
             
-            # 2. Call the bridge
-            AttendanceImportService.process_import_run(run, rows, context, user)
+            # 2. Call the service
+            success, errors = AttendanceImportService.process_import_run(run, rows, user)
 
             # 4. Audit
             AuditLogger.log(
@@ -33,23 +32,19 @@ class DataImportService:
                 entity=run,
                 metadata={
                     "rows_processed": len(rows),
-                    "class_group_id": context.get('class_group_id'),
-                    "date": context.get('eth_date')
+                    "success": success,
+                    "errors": errors
                 }
             )
 
-        
-
     @staticmethod
-    def _process_row(import_type, row):
+    def _process_row(import_type, row, user):
         """
         Internal logic to route row data to the correct app service.
         """
         if import_type == 'ATTENDANCE':
-            # This calls Step 7 (Attendance Service)
-            from sundayschool.services import AttendanceService
-            AttendanceService.record_from_import(row)
+            # This is handled in process_import_run for attendance
+            pass
         elif import_type == 'STUDENTS':
-            # This calls Step 2 (Registration Service)
-            from sundayschool.services import SSDeploymentService
-            SSDeploymentService.register_from_import(row)
+            from sundayschool.services import StudentRegistrationService
+            StudentRegistrationService.register_from_import(row, user)
