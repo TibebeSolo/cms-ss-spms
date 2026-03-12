@@ -1,25 +1,26 @@
-<tr id="student-row-{{ student.id }}" class="align-middle">
-    <td>
-        <div class="fw-bold">{{ student.christian.first_name }} {{ student.christian.father_name }}</div>
-        <small class="text-muted">{{ student.ssid }}</small>
+<tr id="student-row-{{ student.id }}" class="sidebar-item-row align-middle border-bottom border-light">
+    <td class="px-4 py-3">
+        <div class="fw-bold text-body">{{ student.christian.first_name }} {{ student.christian.father_name }}</div>
+        <small class="badge bg-light text-muted border font-monospace x-small">{{ student.ssid }}</small>
     </td>
-    <td>
+    <td class="px-4 py-3">
         <span
-            class="badge rounded-pill {% if student.is_active %}bg-success-subtle text-success{% else %}bg-secondary-subtle text-secondary{% endif %}">
-            {{ student.status.name }}
+            class="badge rounded-pill {% if student.is_active %}bg-success-subtle text-success{% else %}bg-secondary-subtle text-secondary{% endif %} px-2 py-1">
+            <i class="bi bi-circle-fill me-1" style="font-size: 0.5rem;"></i> {{ student.status.name }}
         </span>
     </td>
-    <td>{{ student.grade.name }} - {{ student.section.name }}</td>
-    <td class="text-end">
-        <div class="btn-group shadow-sm">
-            <button class="btn btn-sm btn-light border" hx-get="{% url 'ss:student-detail' student.id %}"
-                hx-target="#main-content">
-                <i class="bi bi-eye"></i>
+    <td class="px-4 py-3 text-body-secondary fw-medium">{{ student.grade.name }} <span class="mx-1 text-muted">/</span>
+        {{ student.section.name }}</td>
+    <td class="px-4 py-3 text-end">
+        <div class="btn-group btn-group-sm rounded-pill overflow-hidden shadow-sm border">
+            <button class="btn btn-light px-3" hx-get="{% url 'ss:student-detail' student.id %}"
+                hx-target="#main-content" title="View Details">
+                <i class="bi bi-eye text-primary"></i>
             </button>
             {% if perms.sundayschool.change_ssstudentprofile %}
-            <button class="btn btn-sm btn-light border" hx-post="{% url 'ss:toggle-status' student.id %}"
-                hx-target="#student-row-{{ student.id }}" hx-swap="outerHTML">
-                <i class="bi bi-arrow-repeat text-brand-secondary"></i>
+            <button class="btn btn-light px-3 border-start" hx-post="{% url 'ss:toggle-status' student.id %}"
+                hx-target="#student-row-{{ student.id }}" hx-swap="outerHTML" title="Toggle Status">
+                <i class="bi bi-arrow-repeat text-warning"></i>
             </button>
             {% endif %}
         </div>

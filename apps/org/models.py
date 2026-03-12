@@ -20,8 +20,8 @@ class SundaySchool(models.Model):
     phone = models.CharField(max_length=20)
    
     # Branding - State of the Art Technique: Store Hex/HSL
-    primary_color = models.CharField(max_length=7, default="#1e3a8a", help_text="Hex code for primary brand")
-    secondary_color = models.CharField(max_length=7, default="#fbbf24", help_text="Hex code for secondary brand")
+    primary_color = models.CharField(max_length=7, default="#162736", help_text="Hex code for primary brand")
+    secondary_color = models.CharField(max_length=7, default="#FCEB9E", help_text="Hex code for secondary brand")
     
     # Multi-Logo Strategy
     primary_logo = models.ImageField(upload_to='org/logos/', null=True, blank=True, help_text="Full logo for headers")

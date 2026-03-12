@@ -1,29 +1,38 @@
-<table class="table table-hover align-middle">
-    <thead class="table-light">
-        <tr>
-            <th>Login ID (SSID)</th>
-            <th>Officer Name</th>
-            <th>System Role</th>
-            <th>Account Status</th>
+<table class="table table-hover align-middle mb-0">
+    <thead class="bg-light bg-opacity-50">
+        <tr class="small text-uppercase text-muted fw-bold">
+            <th class="px-4 py-3">Login ID (SSID)</th>
+            <th class="px-4 py-3">Officer Name</th>
+            <th class="px-4 py-3 text-center">System Role</th>
+            <th class="px-4 py-3 text-end">Account Status</th>
         </tr>
     </thead>
-    <tbody>
+    <tbody class="border-top-0">
         {% for officer in officers %}
-        <tr>
-            <td>
-                <span class="badge bg-dark font-monospace">{{ officer.username }}</span>
+        <tr class="sidebar-item-row border-bottom border-light">
+            <td class="px-4 py-3">
+                <span class="badge bg-light text-muted border font-monospace x-small">{{ officer.username }}</span>
             </td>
-            <td>{{ officer.get_full_name }}</td>
-            <td>
+            <td class="px-4 py-3 fw-bold text-body">{{ officer.get_full_name }}</td>
+            <td class="px-4 py-3 text-center">
                 {% for ur in officer.user_roles.all %}
-                <span class="badge bg-brand-primary">{{ ur.role.name }}</span>
+                <span
+                    class="badge rounded-pill bg-brand-primary border border-brand-primary border-opacity-25 px-3 py-1 x-small fw-bold">
+                    {{ ur.role.name|upper }}
+                </span>
                 {% endfor %}
             </td>
-            <td>
+            <td class="px-4 py-3 text-end">
                 {% if officer.requires_password_change %}
-                <span class="text-warning small"><i class="bi bi-clock"></i> Needs Password Change</span>
+                <span
+                    class="badge rounded-pill bg-warning-subtle text-warning border border-warning-subtle px-2 py-1 x-small">
+                    <i class="bi bi-shield-exclamation me-1"></i> RESET REQUIRED
+                </span>
                 {% else %}
-                <span class="text-success small"><i class="bi bi-check-circle"></i> Active</span>
+                <span
+                    class="badge rounded-pill bg-success-subtle text-success border border-success-subtle px-2 py-1 x-small">
+                    <i class="bi bi-shield-check me-1"></i> ACTIVE
+                </span>
                 {% endif %}
             </td>
         </tr>

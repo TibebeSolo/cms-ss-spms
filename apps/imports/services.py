@@ -1,3 +1,4 @@
+from sundayschool.services import AttendanceImportService
 import csv
 import io
 from django.utils import timezone
@@ -17,43 +18,27 @@ class DataImportService:
             started_by=user
         )
         
-        counts = {'total': 0, 'success': 0, 'errors': 0}
-        
-        try:
-            # 2. Process Rows (Example for CSV)
-            decoded_file = file_obj.read().decode('utf-8')
-            reader = csv.DictReader(io.StringIO(decoded_file))
+        if import_type == 'ATTENDANCE':
+            from sundayschool.services import AttendanceImportBridge
+            # 1. Parse rows into a list of dicts
+            rows = DataImportService._parse_file_to_list(file_obj)
             
-            for row_idx, row in enumerate(reader, start=1):
-                counts['total'] += 1
-                try:
-                    with transaction.atomic():
-                        DataImportService._process_row(import_type, row)
-                        counts['success'] += 1
-                except Exception as e:
-                    counts['errors'] += 1
-                    ImportRowError.objects.create(
-                        import_run=run,
-                        row_number=row_idx,
-                        error_code="PROCESSING_ERROR",
-                        message=str(e),
-                        raw_payload=str(row)
-                    )
-
-            # 3. Finalize
-            run.status = 'COMPLETED' if counts['errors'] == 0 else 'COMPLETED_WITH_ERRORS'
-            run.summary_counts = counts
-            run.finished_at = timezone.now()
-            run.save()
+            # 2. Call the bridge
+            AttendanceImportService.process_import_run(run, rows, context, user)
 
             # 4. Audit
-            AuditLogger.log(user, f"IMPORT_{import_type}", run, metadata=counts)
+            AuditLogger.log(
+                actor=user,
+                action_type="ATTENDANCE_IMPORT_SUCCESS",
+                entity=run,
+                metadata={
+                    "rows_processed": len(rows),
+                    "class_group_id": context.get('class_group_id'),
+                    "date": context.get('eth_date')
+                }
+            )
 
-        except Exception as fatal_error:
-            run.status = 'FAILED'
-            run.summary_counts = counts
-            run.save()
-            raise fatal_error
+        
 
     @staticmethod
     def _process_row(import_type, row):

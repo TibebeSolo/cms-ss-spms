@@ -1,15 +1,25 @@
-<tr id="student-{{ student.id }}">
-    <td>{{ student.christian.first_name }}</td>
-    <td>
-        <div class="btn-group btn-group-sm">
-            <button class="btn btn-outline-success" hx-post="{% url 'ss:mark-attendance' student.id 'PRESENT' %}"
-                hx-target="#student-{{ student.id }}" hx-swap="outerHTML">
-                Present
+<tr id="record-row-{{ record.id }}" class="{% if just_saved %}table-success-flash{% endif %}">
+    <td class="font-monospace fw-bold text-muted small">{{ record.ss_student_profile.ssid }}</td>
+    <td>{{ record.ss_student_profile.christian.first_name }} {{ record.ss_student_profile.christian.father_name }}</td>
+    <td class="text-center">
+        <div class="btn-group btn-group-sm shadow-sm" role="group">
+            {% for val, label in status_choices %}
+            <button type="button"
+                class="btn {% if record.status == val %}btn-dark{% else %}btn-outline-secondary{% endif %}"
+                hx-post="{% url 'sundayschool:hx-update-record' record.id %}" hx-vals='{"status": "{{ val }}"}'
+                hx-target="#record-row-{{ record.id }}" hx-swap="outerHTML" {% if session.status !='DRAFT' %}disabled{%
+                endif %}>
+                {{ label }}
             </button>
-            <button class="btn btn-outline-danger" hx-post="{% url 'ss:mark-attendance' student.id 'ABSENT' %}"
-                hx-target="#student-{{ student.id }}" hx-swap="outerHTML">
-                Absent
-            </button>
+            {% endfor %}
         </div>
+        {% if just_saved %}
+        <small class="text-success ms-2 animate-fade-out"><i class="bi bi-check-lg"></i></small>
+        {% endif %}
+    </td>
+    <td>
+        <input type="text" class="form-control form-control-sm border-0 bg-light" placeholder="Add note..."
+            value="{{ record.note }}" hx-post="{% url 'sundayschool:hx-update-record-note' record.id %}"
+            hx-trigger="keyup delay:1s" {% if session.status !='DRAFT' %}disabled{% endif %}>
     </td>
 </tr>

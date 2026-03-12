@@ -28,7 +28,6 @@ urlpatterns = [
 
     # Modular Apps (Uncomment these as you create the urls.py inside each app)
     # path('people/', include('apps.people.urls', namespace='people')),
-    path('ss/', include('sundayschool.urls', namespace='ss')),
-    # path('melody/', include('apps.melody.urls', namespace='melody')),
+    path('melody/', include('apps.melody.urls', namespace='melody')),
     # path('identity/', include('apps.identity.urls', namespace='identity')),
 ]
