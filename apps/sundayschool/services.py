@@ -248,16 +248,45 @@ class StudentRegistrationService:
         if not default_status:
             default_status, _ = StudentStatus.objects.get_or_create(name="Active", is_default=True)
 
-        # 3. Create SSStudentProfile
+        # 3. Handle Confession Father (Manual Entry)
+        confession_father = None
+        cf_name = ss_data.get('confession_father_name')
+        if cf_name:
+            confession_father, created = ConfessionFather.objects.get_or_create(
+                full_name=cf_name,
+                defaults={'phone': 'N/A', 'servant_church': 'N/A', 'residence': 'N/A'}
+            )
+
+        # 4. Create SSStudentProfile
         student = SSStudentProfile.objects.create(
             christian=christian,
             grade=ss_data['grade'],
             section=ss_data['section'],
             joined_year_eth=ss_data['joined_year_eth'],
-            confession_father=ss_data.get('confession_father'),
+            confession_father=confession_father,
             student_status=default_status,
             registration_state='ACTIVE' # Defaulting to ACTIVE for this direct registration
         )
+
+        # 5. Handle Contact Person
+        contact_data = ss_data.get('contact_person')
+        if contact_data and contact_data.get('full_name'):
+            from people.models import RelationshipType, ContactPerson
+            rel_type, _ = RelationshipType.objects.get_or_create(name=contact_data.get('relationship', 'Parent'))
+            contact = ContactPerson.objects.create(
+                full_name=contact_data['full_name'],
+                relationship_type=rel_type,
+                phone=contact_data['phone'],
+                address=contact_data['address'],
+                linked_christian=christian
+            )
+            # Create the link
+            from .models import StudentContactLink
+            StudentContactLink.objects.create(
+                ss_student_profile=student,
+                contact_person=contact,
+                is_primary=True
+            )
         
         # 4. SSID is auto-generated in the model's save() method.
         # Calling save again just in case, though first create() should have handled it.
