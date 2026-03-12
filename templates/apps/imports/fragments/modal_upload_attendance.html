@@ -1,0 +1,42 @@
+<div class="modal-header bg-primary text-white">
+    <h5 class="modal-title fw-bold"><i class="bi bi-file-earmark-arrow-up"></i> Import Excel/CSV Attendance</h5>
+    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+</div>
+<form hx-post="{% url 'imports:process-attendance' %}" hx-encoding="multipart/form-data" hx-target="#modal-body">
+    {% csrf_token %}
+    <div class="modal-body">
+        <div class="row g-3 mb-4">
+            <div class="col-md-12">
+                <label class="form-label small fw-bold text-muted text-uppercase">1. Target Class Group</label>
+                <select name="class_group_id" class="form-select shadow-sm" required>
+                    <option value="" selected disabled>Select Class...</option>
+                    {% for cg in class_groups %}
+                    <option value="{{ cg.id }}">{{ cg.grade.name }} - {{ cg.section.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-md-12">
+                {% include "components/forms/eth_date_picker.html" with prefix="import" label="2. Attendance Date
+                (Ethiopian)" show_today_btn=True %}
+            </div>
+
+            <div class="col-md-12">
+                <label class="form-label small fw-bold text-muted text-uppercase">3. Upload Export File
+                    (CSV/Excel)</label>
+                <input type="file" name="attendance_file" class="form-control" accept=".csv, .xlsx, .xls" required>
+                <div class="form-text mt-1">Upload the file generated from the Flutter app.</div>
+            </div>
+        </div>
+
+        <div class="alert alert-secondary border-0 small">
+            <i class="bi bi-info-circle-fill me-2"></i>
+            The system will match students by their <strong>SSID</strong>. Any student in the file not found in the
+            database will be logged as an error.
+        </div>
+    </div>
+    <div class="modal-footer bg-light">
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-brand px-4">Start Import</button>
+    </div>
+</form>

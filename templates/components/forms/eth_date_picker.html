@@ -4,7 +4,14 @@ Usage Example:
 #}
 
 <div class="eth-date-picker mb-3" id="picker-{{ prefix }}">
-    <label class="form-label fw-bold small text-muted text-uppercase">{{ label|default:"Ethiopian Date" }}</label>
+    <div class="d-flex justify-content-between align-items-end mb-1">
+        <label class="form-label fw-bold small text-muted text-uppercase mb-0">{{ label|default:"Ethiopian Date"
+            }}</label>
+        {% if show_today_btn %}
+        <button type="button" class="btn btn-sm btn-link text-decoration-none py-0 x-small"
+            onclick="setEthToday_{{ prefix }}()">Set Today</button>
+        {% endif %}
+    </div>
 
     <div class="input-group shadow-sm">
         <input type="number" class="form-control text-center" name="eth_day" placeholder="Day" min="1" max="30"
@@ -12,7 +19,8 @@ Usage Example:
             hx-include="#picker-{{ prefix }} input, #picker-{{ prefix }} select" hx-target="#greg-feedback-{{ prefix }}"
             hx-trigger="keyup delay:400ms changed, change">
 
-        <select class="form-select" name="eth_month" hx-get="{% url 'people:hx-convert-eth-date' %}"
+        <select class="form-select" name="{{ prefix }}_month" id="{{ prefix }}_month"
+            hx-get="{% url 'people:hx-convert-eth-date' %}"
             hx-include="#picker-{{ prefix }} input, #picker-{{ prefix }} select" hx-target="#greg-feedback-{{ prefix }}"
             hx-trigger="change">
             <option value="" selected disabled>Month</option>
@@ -31,8 +39,8 @@ Usage Example:
             <option value="13">13 - Pagume</option>
         </select>
 
-        <input type="number" class="form-control text-center" name="eth_year" placeholder="Year (EC)" min="1900"
-            max="2100" hx-get="{% url 'people:hx-convert-eth-date' %}"
+        <input type="number" class="form-control text-center" name="{{ prefix }}_year" id="{{ prefix }}_year"
+            placeholder="Year (EC)" min="1900" max="2100" hx-get="{% url 'people:hx-convert-eth-date' %}"
             hx-include="#picker-{{ prefix }} input, #picker-{{ prefix }} select" hx-target="#greg-feedback-{{ prefix }}"
             hx-trigger="keyup delay:400ms changed, change">
     </div>
@@ -42,6 +50,20 @@ Usage Example:
             equivalent.</span>
     </div>
 </div>
+
+{% if show_today_btn %}
+<script>
+    // A simple helper to populate current Ethiopian date (You can inject exact server-side Eth date here if preferred)
+    function setEthToday_{ { prefix } } () {
+        // Assuming your backend passes current_eth_day, month, year into context for the dashboard
+        document.getElementById('{{ prefix }}_day').value = '{{ current_eth_day|default:"" }}';
+        document.getElementById('{{ prefix }}_month').value = '{{ current_eth_month|default:"" }}';
+        document.getElementById('{{ prefix }}_year').value = '{{ current_eth_year|default:"" }}';
+        // Trigger HTMX update manually
+        htmx.trigger('#{{ prefix }}_day', 'change');
+    }
+</script>
+{% endif %}
 
 <style>
     /* Slight visual polish for the picker */

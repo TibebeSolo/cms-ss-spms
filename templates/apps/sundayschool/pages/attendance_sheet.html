@@ -1,0 +1,121 @@
+{% extends "layouts/dashboard.html" %}
+
+{% block page_title %}Attendance Sheet: {{ session.class_group }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid content-fade">
+    <div class="card shadow-sm border-0 rounded-4 overflow-hidden mb-4">
+        <div class="card-body p-4 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-1 x-small text-uppercase fw-bold tracking-wider">
+                        <li class="breadcrumb-item"><a href="{% url 'sundayschool:attendance-dashboard' %}"
+                                class="text-decoration-none text-muted">Attendance</a></li>
+                        <li class="breadcrumb-item active text-brand-primary" aria-current="page">{{ session.class_group
+                            }}</li>
+                    </ol>
+                </nav>
+                <h4 class="fw-bold mb-0 text-body">
+                    Session: {{ session.attendance_date_eth_day }}/{{ session.attendance_date_eth_month }}/{{
+                    session.attendance_date_eth_year }}
+                </h4>
+                <div class="small text-muted mt-1">
+                    <i class="bi bi-info-circle me-1"></i> Academic Year: {{ session.academic_year_eth }}
+                </div>
+            </div>
+
+            <div class="d-flex gap-3 align-items-center">
+                {% if session.status == 'DRAFT' %}
+                <span class="badge rounded-pill bg-warning-subtle text-warning border border-warning-subtle px-3 py-2">
+                    <i class="bi bi-pencil-fill me-1"></i> DRAFT
+                </span>
+                <button class="btn btn-brand btn-sm px-4 rounded-pill fw-bold"
+                    hx-post="{% url 'sundayschool:hx-submit-attendance' session.id %}"
+                    hx-confirm="Are you sure you want to submit this for approval? You won't be able to edit it after.">
+                    <i class="bi bi-send-fill me-2"></i> Submit for Approval
+                </button>
+                {% elif session.status == 'PENDING_APPROVAL' %}
+                <span class="badge rounded-pill bg-info-subtle text-info border border-info-subtle px-3 py-2">
+                    <i class="bi bi-clock-history me-1"></i> PENDING APPROVAL
+                </span>
+                {% if per_executive_role %}
+                <button class="btn btn-success btn-sm px-4 rounded-pill fw-bold shadow-sm"
+                    hx-get="{% url 'sundayschool:hx-approve-modal' session.id %}" hx-target="#modal-body"
+                    data-bs-toggle="modal" data-bs-target="#remoteModal">
+                    <i class="bi bi-check-lg me-2"></i> Approve Session
+                </button>
+                {% endif %}
+                {% else %}
+                <span class="badge rounded-pill bg-success-subtle text-success border border-success-subtle px-3 py-2">
+                    <i class="bi bi-check-all me-1"></i> APPROVED
+                </span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0 rounded-4 overflow-hidden mb-5">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light bg-opacity-50">
+                    <tr class="small text-uppercase text-muted fw-bold">
+                        <th class="px-4 py-3" style="width: 150px;">SSID</th>
+                        <th class="px-4 py-3">Student Name</th>
+                        <th class="px-4 py-3 text-center">Status</th>
+                        <th class="px-4 py-3">Note</th>
+                    </tr>
+                </thead>
+                <tbody class="border-top-0">
+                    {% for record in records %}
+                    <tr id="record-row-{{ record.id }}" class="sidebar-item-row">
+                        <td class="px-4 py-3">
+                            <span class="badge bg-light text-muted border font-monospace x-small">{{
+                                record.ss_student_profile.ssid }}</span>
+                        </td>
+                        <td class="px-4 py-3">
+                            <div class="fw-bold text-body">{{ record.ss_student_profile.christian.first_name }} {{
+                                record.ss_student_profile.christian.father_name }}</div>
+                            <div class="x-small text-muted">{{ record.ss_student_profile.christian.grandfather_name }}
+                            </div>
+                        </td>
+                        <td class="px-4 py-3 text-center">
+                            <div class="btn-group btn-group-sm rounded-3 overflow-hidden shadow-sm" role="group">
+                                {% for val, label in status_choices %}
+                                <button type="button"
+                                    class="btn px-3 {% if record.status == val %}btn-dark{% else %}btn-outline-secondary opacity-75{% endif %}"
+                                    hx-post="{% url 'sundayschool:hx-update-record' record.id %}"
+                                    hx-vals='{"status": "{{ val }}"}' hx-target="#record-row-{{ record.id }}"
+                                    hx-swap="outerHTML" {% if session.status !='DRAFT' %}disabled{% endif %}>
+                                    {{ label }}
+                                </button>
+                                {% endfor %}
+                            </div>
+                        </td>
+                        <td class="px-4 py-3">
+                            <div class="input-group input-group-sm border rounded-pill overflow-hidden bg-light px-2"
+                                style="max-width: 250px;">
+                                <span class="input-group-text bg-transparent border-0 opacity-50"><i
+                                        class="bi bi-sticky"></i></span>
+                                <input type="text" class="form-control border-0 bg-transparent x-small py-2"
+                                    placeholder="Add note..." value="{{ record.note }}"
+                                    hx-post="{% url 'sundayschool:hx-update-record-note' record.id %}"
+                                    hx-trigger="keyup delay:1s" {% if session.status !='DRAFT' %}disabled{% endif %}>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="remoteModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4" id="modal-body"></div>
+    </div>
+</div>
+{% endblock %}
+
+
+{% endblock %}

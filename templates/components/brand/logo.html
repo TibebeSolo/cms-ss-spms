@@ -1,15 +1,18 @@
 {% if mode == "symbol" %}
-{# Used for Favicons or Collapsed Sidebars #}
-<img src="{{ brand.symbol_logo.url|default:'/static/img/default-symbol.png' }}" alt="Symbol"
+<img src="{% if brand_symbol %}{{ brand_symbol.url }}{% else %}/static/img/default-symbol.png{% endif %}" alt="Symbol"
     style="height: 32px; width: auto; object-fit: contain;">
 {% else %}
-{# Main Sidebar / Login Page #}
 <div class="d-flex align-items-center gap-2">
-    <img src="{{ brand.primary_logo.url|default:'/static/img/default-logo.png' }}" alt="{{ brand.name }}"
-        style="height: 48px; width: auto; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));">
+    <img src="{% if brand_logo %}{{ brand_logo.url }}{% else %}/static/img/default-logo.png{% endif %}"
+        alt="{{ brand.name|default:'SPMS' }}"
+        style="height: 40px; width: auto; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));">
     <div class="lh-1">
-        <div class="fw-bold text-white small">{{ brand.name }}</div>
-        <div class="text-brand-secondary x-small fw-bold">{{ brand.abbreviation }} SPMS</div>
+        <div class="fw-bold small {% if in_sidebar %}text-white{% else %}text-body{% endif %}">
+            {{ brand.name|default:"Sunday School" }}
+        </div>
+        <div class="text-brand-secondary x-small fw-bold">
+            {{ brand.abbreviation|default:"SS" }} SPMS
+        </div>
     </div>
 </div>
 {% endif %}

@@ -1,43 +1,43 @@
-<aside id="sidebar" class="bg-brand-primary text-white shadow" style="width: var(--sidebar-width);">
-    <div class="p-4 d-flex flex-column h-100">
-        <div class="mb-5 px-2">
-            {% include "components/brand/logo.html" with mode="primary" %}
+<aside id="sidebar" class="bg-body border-end d-flex flex-column shadow-sm"
+    style="width: var(--sidebar-width); min-height: 100vh; position: sticky; top: 0;">
+    <div class="p-4 flex-grow-1">
+        <div class="mb-5 d-flex align-items-center gap-3 px-2">
+            <div class="bg-brand-primary rounded p-2 d-flex align-items-center justify-content-center shadow-sm"
+                style="width: 40px; height: 40px;">
+                <i class="bi bi-mortarboard-fill text-white fs-5"></i>
+            </div>
+            <span class="fw-bold fs-5 tracking-tight text-body">{{ brand.abbreviation|default:"SPMS" }}</span>
         </div>
 
-        <nav class="nav flex-column gap-2" hx-boost="true" hx-target="#main-content" hx-indicator=".htmx-indicator">
-            <a href="/" class="nav-link text-white d-flex align-items-center gap-3 rounded px-3 py-2 active-bg">
-                <i class="bi bi-speedometer2"></i> Dashboard
+        <nav class="nav flex-column gap-2">
+            <a href="/"
+                class="nav-link d-flex align-items-center gap-3 rounded px-3 py-2 text-body-secondary fw-medium sidebar-item {% if request.path == '/' %}active{% endif %}">
+                <i class="bi bi-grid-1x2-fill"></i> Dashboard
             </a>
 
             {% if perms.sundayschool.view_ssstudentprofile %}
-            <div class="mt-4 small text-uppercase opacity-50 px-3 fw-bold">Management</div>
-            <a href="{% url 'sundayschool:student-register' %}"
-                class="nav-link text-white d-flex align-items-center gap-3 rounded px-3 py-2">
-                <i class="bi bi-person-plus-fill"></i> New Registration
-            </a>
-            <a href="{% url 'sundayschool:student-list' %}"
-                class="nav-link text-white d-flex align-items-center gap-3 rounded px-3 py-2">
-                <i class="bi bi-people"></i> Students List
-            </a>
-            <a href="{% url 'sundayschool:attendance' %}"
-                class="nav-link text-white d-flex align-items-center gap-3 rounded px-3 py-2">
-                <i class="bi bi-calendar-check"></i> Attendance
-            </a>
-            {% endif %}
+            <div class="mt-4 mb-2 small text-uppercase fw-bold text-muted px-3"
+                style="font-size: 0.65rem; letter-spacing: 1px; opacity: 0.7;">Sunday School</div>
 
-            {% if perms.melody.view_mezemranmembership %}
-            <div class="mt-4 small text-uppercase opacity-50 px-3 fw-bold">Melody Dept</div>
-            <a href="{% url 'melody:roster' %}"
-                class="nav-link text-white d-flex align-items-center gap-3 rounded px-3 py-2">
-                <i class="bi bi-music-note-beamed"></i> Mezemran
+            <a href="{% url 'sundayschool:student-register' %}" hx-get="{% url 'sundayschool:student-register' %}"
+                hx-target="#main-content" hx-push-url="true"
+                class="nav-link d-flex align-items-center gap-3 rounded px-3 py-2 text-body-secondary sidebar-item">
+                <i class="bi bi-person-plus-fill"></i> Registration
+            </a>
+
+            <a href="{% url 'sundayschool:student-list' %}" hx-get="{% url 'sundayschool:student-list' %}"
+                hx-target="#main-content" hx-push-url="true"
+                class="nav-link d-flex align-items-center gap-3 rounded px-3 py-2 text-body-secondary sidebar-item">
+                <i class="bi bi-people-fill"></i> Student List
             </a>
             {% endif %}
 
             {% if perms.identity.all %}
-            <div class="mt-auto pt-4 border-top border-white border-opacity-10">
-                <a href="{% url 'identity:sys_dashboard' %}"
-                    class="nav-link text-white d-flex align-items-center gap-3 rounded px-3 py-2">
-                    <i class="bi bi-gear-fill"></i> System Admin
+            <div class="mt-auto pt-4 border-top">
+                <a href="{% url 'identity:sys_admin_dashboard' %}" hx-get="{% url 'identity:sys_admin_dashboard' %}"
+                    hx-target="#main-content" hx-push-url="true"
+                    class="nav-link d-flex align-items-center gap-3 rounded px-3 py-2 text-danger opacity-75 hover-opacity-100 sidebar-item">
+                    <i class="bi bi-shield-lock-fill"></i> System Admin
                 </a>
             </div>
             {% endif %}
@@ -46,12 +46,38 @@
 </aside>
 
 <style>
-    #sidebar .nav-link:hover {
-        background: rgba(255, 255, 255, 0.1);
+    .sidebar-item {
+        transition: var(--transition-smooth);
+        border: 1px solid transparent;
     }
 
-    #sidebar .nav-link.active-bg {
-        background: var(--brand-secondary);
-        color: #000 !important;
+    .sidebar-item:hover {
+        background-color: var(--bs-tertiary-bg);
+        color: var(--brand-primary) !important;
+        transform: translateX(4px);
+    }
+
+    .sidebar-item.active {
+        background-color: color-mix(in srgb, var(--brand-primary), transparent 90%);
+        color: var(--brand-primary) !important;
+        border-color: color-mix(in srgb, var(--brand-primary), transparent 80%);
+        font-weight: 600;
+    }
+
+    .nav-link i {
+        font-size: 1.2rem;
+        opacity: 0.8;
+    }
+
+    .sidebar-item:hover i {
+        opacity: 1;
+    }
+
+    .hover-bg:hover {
+        background-color: var(--bs-tertiary-bg);
+    }
+
+    .btn-icon:hover {
+        background-color: var(--bs-tertiary-bg);
     }
 </style>

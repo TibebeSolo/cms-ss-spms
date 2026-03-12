@@ -3,33 +3,53 @@
 {% block page_title %}System Administration{% endblock %}
 
 {% block content %}
-<div class="container-fluid">
-    <div class="row g-3 mb-4">
+<div class="container-fluid content-fade">
+    <div class="row g-4 mb-5">
         <div class="col-md-4">
-            <div class="card border-0 shadow-sm p-3" style="border-left: 5px solid var(--brand-primary) !important;">
-                <div class="small text-muted fw-bold text-uppercase">Total Officers</div>
-                <h2 class="mb-0">{{ total_officers }}</h2>
+            <div class="card border-0 shadow-sm glass-panel p-4 h-100"
+                style="border-left: 5px solid var(--brand-primary) !important;">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="bg-primary bg-opacity-10 p-3 rounded-circle">
+                        <i class="bi bi-people text-primary fs-3"></i>
+                    </div>
+                    <div>
+                        <div class="small text-muted fw-bold text-uppercase tracking-wider">Total Officers</div>
+                        <h2 class="mb-0 fw-bold">{{ total_officers }}</h2>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="col-md-4">
-            <div class="card border-0 shadow-sm p-3" style="border-left: 5px solid var(--brand-secondary) !important;">
-                <div class="small text-muted fw-bold text-uppercase">Defined Roles</div>
-                <h2 class="mb-0">{{ roles_count }}</h2>
+            <div class="card border-0 shadow-sm glass-panel p-4 h-100"
+                style="border-left: 5px solid var(--brand-secondary) !important;">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="bg-warning bg-opacity-10 p-3 rounded-circle">
+                        <i class="bi bi-shield-check text-warning fs-3"></i>
+                    </div>
+                    <div>
+                        <div class="small text-muted fw-bold text-uppercase tracking-wider">Defined Roles</div>
+                        <h2 class="mb-0 fw-bold">{{ roles_count }}</h2>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="row">
+    <div class="row g-4">
         <div class="col-lg-8">
-            <div class="card shadow-sm border-0">
-                <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
-                    <h5 class="mb-0 fw-bold">Role Management</h5>
-                    <button class="btn btn-brand btn-sm" hx-get="{% url 'identity:role_create' %}"
+            <div class="card shadow-sm border-0 mb-4 h-100">
+                <div
+                    class="card-header bg-white border-bottom-0 d-flex justify-content-between align-items-center py-4 px-4">
+                    <div>
+                        <h5 class="mb-0 fw-bold text-body">Role Management</h5>
+                        <p class="text-muted small mb-0">Manage system access levels and permissions.</p>
+                    </div>
+                    <button class="btn btn-brand btn-sm px-3 rounded-pill" hx-get="{% url 'identity:role_create' %}"
                         hx-target="#modal-content" data-bs-toggle="modal" data-bs-target="#adminModal">
-                        <i class="bi bi-plus-lg"></i> New Role
+                        <i class="bi bi-plus-lg me-2"></i> New Role
                     </button>
                 </div>
-                <div class="card-body" id="role-table-container" hx-get="{% url 'identity:role_list_partial' %}"
+                <div class="card-body px-4" id="role-table-container" hx-get="{% url 'identity:role_list_partial' %}"
                     hx-trigger="load">
                     <div class="text-center py-5">
                         <div class="spinner-border text-primary" role="status"></div>
@@ -38,44 +58,59 @@
             </div>
         </div>
 
-        <div class="row mt-4">
-            <div class="col-lg-12">
-                <div class="card shadow-sm border-0">
-                    <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
-                        <h5 class="mb-0 fw-bold">Officer Management</h5>
-                        <button class="btn btn-brand btn-sm" hx-get="{% url 'identity:officer_create' %}"
-                            hx-target="#modal-content" data-bs-toggle="modal" data-bs-target="#adminModal">
-                            <i class="bi bi-person-plus"></i> Register New Officer
-                        </button>
-                    </div>
-                    <div class="card-body" id="officer-table-container" hx-get="{% url 'identity:officer_list' %}"
-                        hx-trigger="load">
-                        <div class="text-center py-5">
-                            <div class="spinner-border text-primary" role="status"></div>
-                            <p class="text-muted mt-2">Loading Officers...</p>
+        <div class="col-lg-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-white border-bottom-0 py-4 px-4">
+                    <h5 class="mb-0 fw-bold text-body">Security Events</h5>
+                    <p class="text-muted small mb-0">Recent login attempts and audits.</p>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        {% for log in recent_logs %}
+                        <div class="list-group-item px-4 py-3 border-0 border-bottom">
+                            <div class="d-flex justify-content-between align-items-start mb-1">
+                                <span class="fw-medium text-body">{{ log.username_attempted }}</span>
+                                <span
+                                    class="badge rounded-pill {% if log.event_type == 'SUCCESS' %}bg-success-subtle text-success{% else %}bg-danger-subtle text-danger{% endif %} px-2">
+                                    {{ log.event_type }}
+                                </span>
+                            </div>
+                            <div class="text-muted x-small d-flex align-items-center">
+                                <i class="bi bi-clock me-1"></i> {{ log.timestamp|timesince }} ago
+                            </div>
                         </div>
+                        {% empty %}
+                        <div class="text-center py-5">
+                            <i class="bi bi-shield-slash text-muted fs-1 opacity-25"></i>
+                            <p class="text-muted small mt-2">No recent events</p>
+                        </div>
+                        {% endfor %}
                     </div>
                 </div>
             </div>
         </div>
+    </div>
 
-        <div class="col-lg-4">
+    <div class="row mt-4">
+        <div class="col-12">
             <div class="card shadow-sm border-0">
-                <div class="card-header bg-white py-3">
-                    <h5 class="mb-0 fw-bold">Recent Security Events</h5>
-                </div>
-                <div class="list-group list-group-flush small">
-                    {% for log in recent_logs %}
-                    <div class="list-group-item">
-                        <div class="d-flex justify-content-between">
-                            <strong>{{ log.username_attempted }}</strong>
-                            <span
-                                class="badge {% if log.event_type == 'SUCCESS' %}bg-success{% else %}bg-danger{% endif %}">{{
-                                log.event_type }}</span>
-                        </div>
-                        <div class="text-muted text-xs">{{ log.timestamp|timesince }} ago</div>
+                <div
+                    class="card-header bg-white border-bottom-0 d-flex justify-content-between align-items-center py-4 px-4">
+                    <div>
+                        <h5 class="mb-0 fw-bold text-body">Officer Management</h5>
+                        <p class="text-muted small mb-0">System administrators and departmental leads.</p>
                     </div>
-                    {% endfor %}
+                    <button class="btn btn-brand btn-sm px-3 rounded-pill" hx-get="{% url 'identity:officer_create' %}"
+                        hx-target="#modal-content" data-bs-toggle="modal" data-bs-target="#adminModal">
+                        <i class="bi bi-person-plus-fill me-2"></i> Register New Officer
+                    </button>
+                </div>
+                <div class="card-body px-4 pb-4" id="officer-table-container" hx-get="{% url 'identity:officer_list' %}"
+                    hx-trigger="load">
+                    <div class="text-center py-5">
+                        <div class="spinner-border text-primary" role="status"></div>
+                        <p class="text-muted mt-2">Loading Officers...</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -83,8 +118,8 @@
 </div>
 
 <div class="modal fade" id="adminModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content" id="modal-content"></div>
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4" id="modal-content"></div>
     </div>
 </div>
 {% endblock %}

@@ -4,17 +4,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}{{ brand.abbreviation }} | SS-SPMS{% endblock %}</title>
-
+    <title>{% block title %}{{ brand.abbreviation|default:"SS" }} | SPMS{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css">
-
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
 
     <style>
         :root {
 
-            /* Branding Context (Provided by Context Processor) */
+            /* Better CSS variable injection */
             --brand-primary: {
                     {
                     brand_primary|default: "#1e3a8a"
@@ -30,69 +31,99 @@
             }
 
             ;
-
-            /* UI Refinements */
-            --sidebar-width: 280px;
-            --transition-speed: 0.25s;
+            --sidebar-width: 260px;
+            --font-family: 'Inter',
+            system-ui,
+            -apple-system,
+            sans-serif;
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.3);
+            --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* Dynamic Theme Overrides */
         [data-bs-theme="dark"] {
-            --brand-primary-muted: color-mix(in srgb, var(--brand-primary), white 20%);
+            --glass-bg: rgba(33, 37, 41, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            font-family: var(--font-family);
+            color: var(--bs-body-color);
+            background-color: var(--bs-body-bg);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
         .bg-brand-primary {
             background-color: var(--brand-primary) !important;
+            color: white !important;
         }
 
-        .text-brand-secondary {
-            color: var(--brand-secondary) !important;
+        .text-brand-primary {
+            color: var(--brand-primary) !important;
         }
 
         .btn-brand {
             background-color: var(--brand-primary);
             color: white;
             border: none;
-            transition: opacity var(--transition-speed);
+            transition: var(--transition-smooth);
         }
 
         .btn-brand:hover {
-            opacity: 0.9;
+            background-color: color-mix(in srgb, var(--brand-primary), black 15%);
             color: white;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         }
 
-        /* HTMX Loading State */
-        .htmx-indicator {
-            display: none;
+        /* Modern Utilities */
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
         }
 
-        .htmx-request .htmx-indicator {
-            display: inline-block;
+        .content-fade {
+            animation: fadeIn 0.4s ease-out;
         }
 
-        .htmx-request.content-fade {
-            opacity: 0.5;
-            transition: opacity 0.2s;
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Fixed: Light mode text visibility */
+        [data-bs-theme="light"] .text-muted-custom {
+            color: #6c757d !important;
+        }
+
+        [data-bs-theme="dark"] .text-muted-custom {
+            color: #adb5bd !important;
         }
     </style>
 </head>
 
 <body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
-
-    {% block layout %}
-    {% endblock %}
+    {% block layout %}{% endblock %}
 
     <script>
-        const themeToggle = () => {
-            const html = document.getElementById('root-html');
-            const newTheme = html.getAttribute('data-bs-theme') === 'dark' ? 'light' : 'dark';
-            html.setAttribute('data-bs-theme', newTheme);
-            localStorage.setItem('theme', newTheme);
-        };
-        // Persistence
-        if (localStorage.getItem('theme')) {
-            document.getElementById('root-html').setAttribute('data-bs-theme', localStorage.getItem('theme'));
+        // Simple theme toggle
+        function themeToggle() {
+            const html = document.documentElement;
+            const theme = html.getAttribute('data-bs-theme') === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-bs-theme', theme);
+            localStorage.setItem('theme', theme);
         }
+        if (localStorage.getItem('theme')) document.documentElement.setAttribute('data-bs-theme', localStorage.getItem('theme'));
     </script>
 </body>
 
