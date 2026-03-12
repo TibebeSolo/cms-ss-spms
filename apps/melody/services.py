@@ -11,15 +11,18 @@ class MelodyIDService:
         Generates ID: {SSAbbrev}MZ{YY}{RRR}
         Example: ABSSMZ16001
         """
-        ss_prefix = getattr(settings, 'SS_ABBREV', 'SS')
+        from org.models import SundaySchool
+        ss = SundaySchool.objects.filter(is_active=True).first()
+        ss_prefix = ss.abbreviation if ss else "SS"
+
         year_yy = str(entry_year_eth)[-2:]
         
         # Scope roll number to the entry year
         last_mez = MezemranMembership.objects.filter(
-            mez_entry_year_eth=entry_year_eth
-        ).select_for_update().order_by('-mez_roll_number').first()
+            mezmur_entry_year_eth=entry_year_eth
+        ).select_for_update().order_by('-mezemran_roll_number').first()
         
-        roll = (last_mez.mez_roll_number + 1) if last_mez else 1
+        roll = (last_mez.mezemran_roll_number + 1) if last_mez else 1
         
         # Note the "MZ" constant in the middle
         generated_id = f"{ss_prefix}MZ{year_yy}{roll:03d}"

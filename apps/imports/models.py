@@ -37,13 +37,3 @@ class ImportRowError(models.Model):
 
     def __str__(self):
         return f"Row {self.row_number}: {self.error_code}"
-
-class ImportLog(models.Model):
-    import_run = models.ForeignKey(ImportRun, on_delete=models.CASCADE, related_name='import_logs')
-    row_number = models.IntegerField()
-    error_code = models.CharField(max_length=50)
-    message = models.TextField()
-    raw_payload = models.TextField(help_text="The raw row data that failed")
-
-    def __str__(self):
-        return f"Row {self.row_number}: {self.error_code}"
